@@ -73,6 +73,8 @@ conjugate GPU views must be resolved before binding or independent kernel dispat
 `run(copy_outputs=False)` returns borrowed views valid until the next invocation;
 evaluation uses this mode to isolate preallocated execution. Cross-stream ownership
 and host synchronization remain the caller's responsibility.
+Treat borrowed outputs as read-only: they can alias an input or binding-local
+constant. Use the default owned copies when a result must be mutated or retained.
 
 Compiler arena bytes exclude external inputs/constants, reference-computation
 temporaries, returned output copies, GPU driver storage, and compiler caches.

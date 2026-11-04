@@ -2,8 +2,10 @@
 
 The second audit found real defects beyond the original passing suite and review.
 The original 277-test result remains valid historical evidence; it did not cover
-the cases below. Fixes and 96 additional regression cases are implemented in
-source commit `a3c34ea86c9d2c421bfaccf0103d8515a0219624`.
+the cases below. The core fixes and 96 additional regressions are in source
+commit `a3c34ea86c9d2c421bfaccf0103d8515a0219624`; a further 12 real-PyTorch
+precision-state regressions and cleanup correction are in
+`020c779eadf7cb55a42a4e9208a19293028e4d59` (108 added cases in total).
 
 ## Findings and fixes
 
@@ -27,7 +29,7 @@ costs or counts. Manually altered plans must obey that instruction schema.
 
 ## Validation
 
-The expanded physical-GPU suite passed **373 tests**, with no skips or failures.
+The expanded physical-GPU suite passed **385 tests**, with no skips or failures.
 The CPU subset passed 237 tests. Independent exploratory checks covered 2,000
 randomized compiler DAGs, shuffled orders, both precisions, branches, multiple
 outputs and recompilation; simulator experiments covered 80 shape/dtype/hardware
@@ -39,6 +41,9 @@ The refreshed benchmark reports include the source commit and whether implementa
 files were modified at measurement time. The original study in [results.md](results.md)
 and the original raw reports are preserved; their timings must not be attributed to
 the updated LayerNorm kernel.
+The refreshed measurements use `a3c34ea`; the subsequent precision-state cleanup
+correction changes restoration after measurements, not kernel code or in-measurement
+precision. The final tests and installed-wheel checks include that correction.
 
 Build and installation checks include a source distribution and wheel, followed
 by an isolated, non-editable CPU installation: all 237 CPU tests pass there too,
@@ -47,6 +52,16 @@ The dependency compatibility check passes. The refreshed 48-case runtime suite,
 30-case captured suite, both 42-configuration tile sweeps, real CUDA profile and
 all three backend demonstrations pass. Every eager/Inductor comparator is present
 and successful. Hosted CI and final Astra medium review are recorded separately.
+
+Astra's first post-audit round found the additional precision-state issue: restoring
+the boolean TF32 flag after the named `medium` mode invalidated real PyTorch's
+coupled backend state. Flags now restore first and the named mode restores last
+in the profiler context and both benchmark entrypoints. Real-PyTorch tests cover
+all three modes and exception exits, supplementing the earlier mock test.
+
+The final Astra medium rereview is **clean, with no remaining complaints** for
+source `020c779`. Its independent checks and the original review history are
+recorded in [review.md](review.md).
 
 Reproduce the hardware evidence in an installed CUDA environment:
 

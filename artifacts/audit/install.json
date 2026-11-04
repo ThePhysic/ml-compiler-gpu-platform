@@ -23,8 +23,8 @@
     "mlgpu/gpu/__init__.py",
     "mlgpu/gpu/kernels.py"
   ],
-  "wheel_sha256": "ca8cb738dcf96df66f1a02c5b0c9e88fa0bcc98d05ee019fa6ce006c55e92837",
-  "source_commit": "a3c34ea86c9d2c421bfaccf0103d8515a0219624",
+  "wheel_sha256": "b450fc922e5f88b9bf8315dbd504424aa93a8e5cc143ac7335eff75faadc826c",
+  "source_commit": "020c779eadf7cb55a42a4e9208a19293028e4d59",
   "cpu_test_evidence": "cpu-wheel-tests.xml",
   "dependency_check": "uv pip check: all installed packages compatible"
 }
