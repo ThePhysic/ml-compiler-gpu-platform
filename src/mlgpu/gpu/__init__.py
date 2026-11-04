@@ -16,6 +16,7 @@ MAX_REDUCTION_WIDTH = 16384
 MAX_REGION_STEPS = 16
 MAX_REGION_INPUTS = 32
 MAX_RANK = 8
+MAX_GRID_Y = 65535
 _OPCODES = {"add": 0, "mul": 1, "relu": 2, "gelu": 3, "identity": 4}
 
 
@@ -94,6 +95,8 @@ def _validate(node, inputs, output, torch):
         raise ExecutionError("GPU tensors require identical float16 or float32 dtype")
     if any(not tensor.is_contiguous() for tensor in tensors):
         raise ExecutionError("GPU tensors must be contiguous; transpose operations are materialized explicitly")
+    if any(tensor.is_neg() or tensor.is_conj() for tensor in tensors):
+        raise ExecutionError("GPU logical negative/conjugate views are unsupported; resolve tensor flags before dispatch")
     if any(tensor.ndim > MAX_RANK for tensor in tensors):
         raise ResourceError(f"GPU backend supports tensor rank <= {MAX_RANK}")
     if any(tensor.numel() >= 2**31 for tensor in tensors):
@@ -142,7 +145,8 @@ def _tile_config(config, inputs, torch):
 
 
 def _descriptor(tensor):
-    return (tuple(tensor.shape), tuple(tensor.stride()), tensor.dtype, tensor.device, tensor.data_ptr())
+    return (tuple(tensor.shape), tuple(tensor.stride()), tensor.dtype, tensor.device,
+            tensor.data_ptr(), tensor.is_neg(), tensor.is_conj())
 
 
 def prepare_launch(node, inputs, output, config=None):
@@ -220,6 +224,8 @@ def prepare_launch(node, inputs, output, config=None):
             _, n = inputs[1].shape
             bias = inputs[2] if len(inputs) == 3 else output
             grid = (triton.cdiv(m, tiles["block_m"]), triton.cdiv(n, tiles["block_n"]))
+            if grid[1] > MAX_GRID_Y:
+                raise ResourceError(f"GPU matmul y-grid requires {grid[1]} programs, exceeding CUDA's {MAX_GRID_Y} limit; use a wider column tile or a smaller matrix")
             kernel = kernels.matmul_epilogue
             args = (
                 inputs[0], inputs[1], bias, output, m, n, k, len(inputs) == 3,

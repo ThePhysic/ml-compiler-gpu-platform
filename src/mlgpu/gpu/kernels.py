@@ -85,8 +85,12 @@ def layernorm_rows(X, W, B, Y, WIDTH: tl.constexpr, EPS: tl.constexpr,
     row = tl.program_id(0)
     col = tl.arange(0, BLOCK)
     x = tl.load(X + row * WIDTH + col, col < WIDTH, other=0).to(tl.float32)
-    mean = tl.sum(x, axis=0) / WIDTH
-    centered = tl.where(col < WIDTH, x - mean, 0.0)
+    # Translate before summing: large common offsets must not turn an exactly
+    # constant row into a spurious unit-normalized value through mean rounding.
+    anchor = tl.load(X + row * WIDTH).to(tl.float32)
+    shifted = tl.where(col < WIDTH, x - anchor, 0.0)
+    mean = tl.sum(shifted, axis=0) / WIDTH
+    centered = tl.where(col < WIDTH, shifted - mean, 0.0)
     variance = tl.sum(centered * centered, axis=0) / WIDTH
     normalized = centered * tl.rsqrt(variance + EPS)
     weight = tl.load(W + col, col < WIDTH, other=0).to(tl.float32)

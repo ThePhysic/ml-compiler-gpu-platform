@@ -66,7 +66,6 @@ def demo(args):
             report["simulator_cost_estimate"] = estimate(simplan)
         elif backend == "gpu":
             import torch
-            torch.backends.cuda.matmul.allow_tf32 = False
             program = Program(graph, backend="gpu", optimize=optimized)
             device_inputs = {name: torch.from_numpy(value).to("cuda:0") for name, value in inputs.items()}
             actual_device = program.run(device_inputs)

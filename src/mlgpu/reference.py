@@ -1,6 +1,7 @@
 """Numerical semantics: FP32 arithmetic, explicit tensor dtype boundaries."""
 from __future__ import annotations
 
+from collections.abc import Mapping
 import numpy as np
 
 from .errors import ExecutionError
@@ -45,7 +46,10 @@ def evaluate_node(node: Node, values: dict[str, np.ndarray]) -> np.ndarray:
         exp = np.exp(a[0] - np.max(a[0], axis=-1, keepdims=True))
         result = exp / np.sum(exp, axis=-1, keepdims=True)
     elif op == "layernorm":
-        centered = a[0] - np.mean(a[0], axis=-1, keepdims=True)
+        # Translation keeps a constant, large-offset row exactly centered even
+        # when summing its unshifted values would round its mean incorrectly.
+        delta = a[0] - a[0][..., :1]
+        centered = delta - np.mean(delta, axis=-1, keepdims=True)
         variance = np.mean(centered * centered, axis=-1, keepdims=True)
         result = centered / np.sqrt(variance + attrs.get("eps", 1e-5)) * a[1] + a[2]
     elif op == "sum":
@@ -60,8 +64,10 @@ def evaluate_node(node: Node, values: dict[str, np.ndarray]) -> np.ndarray:
 
 
 def validate_inputs(graph: Graph, inputs: dict[str, np.ndarray]):
+    if not isinstance(inputs, Mapping):
+        raise ExecutionError("inputs must be a mapping of tensor names to arrays")
     if set(inputs) != set(graph.inputs):
-        raise ExecutionError(f"input names: expected {sorted(graph.inputs)}, got {sorted(inputs)}")
+        raise ExecutionError(f"input names: expected {sorted(graph.inputs)}, got {sorted(repr(name) for name in inputs)}")
     for name, spec in graph.inputs.items():
         a = inputs[name]
         if not isinstance(a, np.ndarray) or a.shape != spec.shape or a.dtype.name != spec.dtype or not a.flags.c_contiguous:

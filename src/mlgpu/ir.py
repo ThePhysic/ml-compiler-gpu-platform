@@ -6,6 +6,7 @@ copy operations; no hidden views or aliasing enter lifetime analysis.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from copy import deepcopy
 import json
 import math
 from typing import Any
@@ -56,6 +57,10 @@ class Node:
     attrs: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
+        self.validate_fields()
+        self.inputs = tuple(self.inputs)
+
+    def validate_fields(self):
         if not isinstance(self.op, str) or not self.op:
             raise GraphError("operation name must be a nonempty string")
         if not isinstance(self.output, str) or not self.output:
@@ -64,10 +69,9 @@ class Node:
             raise GraphError("node inputs must be a list or tuple of nonempty names")
         if not isinstance(self.attrs, dict) or any(not isinstance(x, str) for x in self.attrs):
             raise GraphError("operation attributes must be a dict with string keys")
-        self.inputs = tuple(self.inputs)
 
     def to_dict(self):
-        return {"op": self.op, "inputs": list(self.inputs), "output": self.output, "attrs": self.attrs}
+        return {"op": self.op, "inputs": list(self.inputs), "output": self.output, "attrs": deepcopy(self.attrs)}
 
 
 def _broadcast(a, b):
@@ -118,8 +122,13 @@ def infer_node(node: Node, specs: dict[str, TensorSpec]) -> TensorSpec:
         if any(s.shape != (shape[-1],) for s in inputs[1:]):
             raise GraphError("layernorm weight/bias must match last input dimension")
         eps = node.attrs.get("eps", 1e-5)
-        if isinstance(eps, bool) or not isinstance(eps, (int, float)) or not math.isfinite(eps) or eps <= 0:
-            raise GraphError("layernorm eps must be finite and positive")
+        try:
+            finite = isinstance(eps, (int, float)) and not isinstance(eps, bool) and math.isfinite(eps)
+            representable = finite and float(np.finfo(np.float32).tiny) <= eps <= float(np.finfo(np.float32).max)
+        except (OverflowError, TypeError):
+            representable = False
+        if not representable:
+            raise GraphError("layernorm eps must be positive, normal and finite in float32")
     elif node.op == "reshape":
         try:
             result = TensorSpec(tuple(node.attrs["shape"]), first.dtype)
@@ -173,20 +182,29 @@ class Graph:
     name: str = "graph"
 
     def __post_init__(self):
+        self.validate_fields()
+        self.nodes = list(self.nodes)
+        self.outputs = tuple(self.outputs)
+
+    def validate_fields(self):
         if not isinstance(self.inputs, dict) or not isinstance(self.constants, dict) or not isinstance(self.nodes, (tuple, list)):
             raise GraphError("graph requires input/constant mappings and a node sequence")
         if not isinstance(self.outputs, (tuple, list)) or any(not isinstance(x, str) or not x for x in self.outputs):
             raise GraphError("graph outputs must be a list or tuple of nonempty names")
-        self.nodes = list(self.nodes)
-        self.outputs = tuple(self.outputs)
 
     def ordered_nodes(self) -> list[Node]:
+        self.validate_fields()
         sources = set(self.inputs) | set(self.constants)
         if set(self.inputs) & set(self.constants):
             raise GraphError("input and constant names overlap")
         names = set(sources)
         for node in self.nodes:
-            if not isinstance(node, Node) or not isinstance(node.output, str) or not node.output or node.output in names:
+            if not isinstance(node, Node):
+                raise GraphError("graph nodes must be Node instances")
+            # Builders may edit dataclass fields before compilation. Recheck
+            # those fields so malformed edits keep the graph-layer error type.
+            node.validate_fields()
+            if node.output in names:
                 raise GraphError(f"duplicate or invalid SSA value {getattr(node, 'output', None)!r}")
             if any(not isinstance(x, str) or not x for x in node.inputs):
                 raise GraphError("node input names must be nonempty strings")
@@ -211,6 +229,7 @@ class Graph:
         return ordered
 
     def specs(self) -> dict[str, TensorSpec]:
+        self.validate_fields()
         specs = dict(self.inputs)
         if any(not isinstance(s, TensorSpec) for s in specs.values()):
             raise GraphError("inputs require TensorSpec values")

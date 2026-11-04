@@ -6,6 +6,7 @@ instructions. Cycles belong to a separately specified, synthetic resource model.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field, replace
+from copy import deepcopy
 import json
 import math
 from typing import Any, Mapping
@@ -83,7 +84,7 @@ class SimulatorPlan:
     def to_dict(self):
         return {"backend": "synthetic_tensor_accelerator", "optimized": self.optimized,
                 "hardware": self.hardware.to_dict(), "graph": self.graph.to_dict(),
-                "tiles": self.tiles, "node_order": [n.output for n in self.scheduled_nodes],
+                "tiles": deepcopy(self.tiles), "node_order": [n.output for n in self.scheduled_nodes],
                 "instructions": [i.to_dict() for i in self.instructions],
                 "estimate": estimate(self)}
 
@@ -218,9 +219,10 @@ def compile_simulator(graph: Graph, hardware: HardwareConfig | None = None,
                     rows, cols = min(bm, m-row), min(bn, n-col)
                     c_token = f"c:{node.output}:{row}:{col}"
                     c_size = rows * cols * 4
+                    location = {"node_index": node_index, "tile": (row, col, rows, cols)}
                     last = emitter.add("zero", base_deps, (c_bank,), flops=rows*cols,
                         buffer_writes={str(c_bank): c_token},
-                        size_by_bank={str(c_bank): c_size}, shape=[rows, cols], bank=c_bank)
+                        size_by_bank={str(c_bank): c_size}, shape=[rows, cols], bank=c_bank, **location)
                     for depth in range(0, k, bk):
                         width = min(bk, k-depth)
                         a_token = f"a:{node.output}:{row}:{col}:{depth}"
@@ -229,14 +231,17 @@ def compile_simulator(graph: Graph, hardware: HardwareConfig | None = None,
                         b_size = width * cols * np.dtype(output_spec.dtype).itemsize
                         load_a = emitter.add("load", (*base_deps, last), (a_bank,), a_size,
                             tensor=node.inputs[0], slices=[[row,row+rows],[depth,depth+width]], bank=a_bank,
-                            buffer_writes={str(a_bank): a_token}, size_by_bank={str(a_bank): a_size})
+                            buffer_writes={str(a_bank): a_token}, size_by_bank={str(a_bank): a_size},
+                            role="a", depth=[depth,width], **location)
                         load_b = emitter.add("load", (*base_deps, last), (b_bank,), b_size,
                             tensor=node.inputs[1], slices=[[depth,depth+width],[col,col+cols]], bank=b_bank,
-                            buffer_writes={str(b_bank): b_token}, size_by_bank={str(b_bank): b_size})
+                            buffer_writes={str(b_bank): b_token}, size_by_bank={str(b_bank): b_size},
+                            role="b", depth=[depth,width], **location)
                         last = emitter.add("mma", (last,load_a,load_b), (a_bank,b_bank,c_bank),
                             flops=2*rows*cols*width, a_bank=a_bank,b_bank=b_bank,c_bank=c_bank,
                             buffer_reads={str(a_bank):a_token,str(b_bank):b_token,str(c_bank):c_token},
-                            buffer_writes={str(c_bank):c_token}, size_by_bank={str(c_bank):c_size})
+                            buffer_writes={str(c_bank):c_token}, size_by_bank={str(c_bank):c_size},
+                            depth=[depth,width], **location)
                     reads = {str(c_bank):c_token}
                     epi_deps = [last]
                     if len(node.inputs) == 3:
@@ -245,7 +250,8 @@ def compile_simulator(graph: Graph, hardware: HardwareConfig | None = None,
                         load_bias = emitter.add("load", base_deps, (bias_bank,), bias_size,
                             tensor=node.inputs[2], broadcast_shape=[m,n],
                             slices=[[row,row+rows],[col,col+cols]], bank=bias_bank,
-                            buffer_writes={str(bias_bank):bias_token},size_by_bank={str(bias_bank):bias_size})
+                            buffer_writes={str(bias_bank):bias_token},size_by_bank={str(bias_bank):bias_size},
+                            role="bias", **location)
                         epi_deps.append(load_bias)
                         reads[str(bias_bank)] = bias_token
                     last = emitter.add("epilogue", epi_deps, tuple(int(b) for b in reads),
@@ -253,11 +259,11 @@ def compile_simulator(graph: Graph, hardware: HardwareConfig | None = None,
                         c_bank=c_bank,bias_bank=bias_bank if len(node.inputs)==3 else None,
                         dtype=output_spec.dtype,activation=node.attrs.get("activation","none"),
                         buffer_reads=reads,buffer_writes={str(c_bank):c_token},
-                        size_by_bank={str(c_bank):rows*cols*np.dtype(output_spec.dtype).itemsize})
+                        size_by_bank={str(c_bank):rows*cols*np.dtype(output_spec.dtype).itemsize}, **location)
                     store = emitter.add("store", (last,), (c_bank,),
                         rows*cols*np.dtype(output_spec.dtype).itemsize,
                         tensor=node.output,slices=[[row,row+rows],[col,col+cols]],bank=c_bank,
-                        buffer_reads={str(c_bank):c_token})
+                        buffer_reads={str(c_bank):c_token}, **location)
                     stores.append(store)
                     context_done[context] = (store,)
         else:
@@ -344,7 +350,204 @@ def _generic_flops(node,specs,count):
     return count*costs.get(node.op,1)
 
 
+def _require(condition, message):
+    if not condition:
+        raise ResourceError(message)
+
+
+def _context_base(bank, offset, hardware):
+    _require(type(bank) is int, "instruction bank operand must be an integer")
+    base = bank-offset
+    _require(base >= 0 and base % 4 == 0 and base//4 < hardware.contexts,
+             "instruction bank operand does not name its context role")
+    return base
+
+
+def _check_metadata(ins, banks, reads=None, writes=None, sizes=None, transfer=0, flops=0):
+    """Validate declarations against work derived from opcode operands and IR."""
+    attrs = ins.attrs
+    _require(ins.banks == tuple(sorted(banks)), f"instruction {ins.id} bank reservations do not match operands")
+    for key, expected in (("buffer_reads", reads or {}), ("buffer_writes", writes or {}),
+                          ("size_by_bank", sizes or {})):
+        reason = "reads uninitialized or overwritten SRAM" if key == "buffer_reads" else f"{key} does not match actual tensor work"
+        _require(attrs.get(key, {}) == expected, f"instruction {ins.id} {reason}")
+    _require(type(ins.transfer_bytes) is int and ins.transfer_bytes == transfer,
+             f"instruction {ins.id} transfer bytes do not match actual tensor work")
+    _require(type(ins.flops) is int and ins.flops == flops,
+             f"instruction {ins.id} arithmetic work does not match its opcode")
+
+
+def _check_fields(ins, expected):
+    _require(isinstance(ins.attrs, dict) and set(ins.attrs) == set(expected),
+             f"instruction {ins.id} has missing or unsupported opcode attributes")
+
+
+def _matrix_contract(ins, plan, specs, state):
+    attrs, hw = ins.attrs, plan.hardware
+    index = attrs.get("node_index")
+    _require(type(index) is int and 0 <= index < len(plan.scheduled_nodes), "invalid matrix instruction node index")
+    node = plan.scheduled_nodes[index]
+    _require(node.op in {"matmul", "fused_matmul"}, "matrix instruction targets a non-matrix graph node")
+    tile = attrs.get("tile")
+    _require(isinstance(tile, (list, tuple)) and len(tile) == 4 and all(type(x) is int for x in tile),
+             "invalid matrix instruction tile")
+    tile = tuple(tile)
+    row, col, rows, cols = tile
+    m, k = specs[node.inputs[0]].shape
+    n = specs[node.inputs[1]].shape[1]
+    config = plan.tiles[node.output]
+    bm, bn, bk = (config[name] for name in ("block_m", "block_n", "block_k"))
+    _require(all(type(x) is int and x > 0 for x in (bm,bn,bk)) and max(bm,bn,bk) <= hw.max_tile,
+             "invalid or oversized matrix tile configuration")
+    _require(0 <= row < m and 0 <= col < n and row % bm == 0 and col % bn == 0
+             and rows == min(bm,m-row) and cols == min(bn,n-col), "matrix tile does not match its declared output region")
+    output = specs[node.output]
+    itemsize = np.dtype(output.dtype).itemsize
+    location = {"node_index", "tile"}
+    c_token = f"c:{node.output}:{row}:{col}"
+    output_slices = [[row,row+rows],[col,col+cols]]
+    if ins.op == "zero":
+        _check_fields(ins, location | {"bank","shape","buffer_writes","size_by_bank"})
+        bank = attrs["bank"]
+        _context_base(bank,2,hw)
+        _require(attrs["shape"] == [rows,cols], "accumulator shape does not match its output tile")
+        _check_metadata(ins,(bank,),writes={str(bank):c_token},sizes={str(bank):rows*cols*4},flops=rows*cols)
+        state[bank] = ("matrix_acc",index,tile,0)
+    elif ins.op == "load":
+        role = attrs.get("role")
+        _require(role in {"a","b","bias"}, "invalid matrix load role")
+        fields = location | {"role","tensor","slices","bank","buffer_writes","size_by_bank"}
+        fields |= {"broadcast_shape"} if role == "bias" else {"depth"}
+        _check_fields(ins, fields)
+        bank = attrs["bank"]
+        _context_base(bank,{"a":0,"b":1,"bias":3}[role],hw)
+        if role == "bias":
+            _require(len(node.inputs) == 3 and attrs["tensor"] == node.inputs[2]
+                     and attrs["broadcast_shape"] == [m,n] and attrs["slices"] == output_slices,
+                     "matrix bias load does not match its graph operand")
+            size = rows*cols*itemsize
+            token = f"bias:{node.output}:{row}:{col}"
+            depth = None
+        else:
+            depth = attrs["depth"]
+            _require(isinstance(depth,(tuple,list)) and len(depth) == 2 and all(type(x) is int for x in depth),
+                     "invalid matrix reduction tile")
+            d,width = depth
+            _require(0 <= d < k and d % bk == 0 and width == min(bk,k-d), "invalid matrix reduction interval")
+            depth = tuple(depth)
+            source = node.inputs[0 if role == "a" else 1]
+            slices = [[row,row+rows],[d,d+width]] if role == "a" else [[d,d+width],[col,col+cols]]
+            _require(attrs["tensor"] == source and attrs["slices"] == slices,
+                     "matrix load does not match its graph operand and reduction interval")
+            size = (rows if role == "a" else cols)*width*itemsize
+            token = f"{role}:{node.output}:{row}:{col}:{d}"
+        _check_metadata(ins,(bank,),writes={str(bank):token},sizes={str(bank):size},transfer=size)
+        state[bank] = ("matrix_input",index,tile,role,depth)
+    elif ins.op == "mma":
+        _check_fields(ins,location | {"a_bank","b_bank","c_bank","depth","buffer_reads","buffer_writes","size_by_bank"})
+        base = _context_base(attrs["c_bank"],2,hw)
+        a,b,c = base,base+1,base+2
+        _require(attrs["a_bank"] == a and attrs["b_bank"] == b, "matrix operand banks do not match the accumulator context")
+        depth = attrs["depth"]
+        _require(isinstance(depth,(tuple,list)) and len(depth) == 2 and all(type(x) is int for x in depth),
+                 "invalid matrix reduction tile")
+        d,width = depth
+        _require(0 <= d < k and d % bk == 0 and width == min(bk,k-d), "invalid matrix reduction interval")
+        _require(state.get(a) == ("matrix_input",index,tile,"a",tuple(depth))
+                 and state.get(b) == ("matrix_input",index,tile,"b",tuple(depth))
+                 and state.get(c) == ("matrix_acc",index,tile,d),
+                 "matrix instruction reads wrong tiles or skips/repeats reduction work")
+        reads = {str(a):f"a:{node.output}:{row}:{col}:{d}",str(b):f"b:{node.output}:{row}:{col}:{d}",str(c):c_token}
+        _check_metadata(ins,(a,b,c),reads=reads,writes={str(c):c_token},sizes={str(c):rows*cols*4},flops=2*rows*cols*width)
+        state[c] = ("matrix_acc",index,tile,d+width)
+    elif ins.op == "epilogue":
+        _check_fields(ins,location | {"c_bank","bias_bank","dtype","activation","buffer_reads","buffer_writes","size_by_bank"})
+        base = _context_base(attrs["c_bank"],2,hw)
+        c,bias = base+2,base+3
+        activation = node.attrs.get("activation","none")
+        _require(attrs["dtype"] == output.dtype and attrs["activation"] == activation,
+                 "epilogue numerical semantics differ from its graph node")
+        _require(state.get(c) == ("matrix_acc",index,tile,k), "epilogue reads an incomplete matrix reduction")
+        reads = {str(c):c_token}
+        if len(node.inputs) == 3:
+            _require(attrs["bias_bank"] == bias and state.get(bias) == ("matrix_input",index,tile,"bias",None),
+                     "epilogue reads an incorrect bias tile")
+            reads[str(bias)] = f"bias:{node.output}:{row}:{col}"
+        else:
+            _require(attrs["bias_bank"] is None, "unexpected matrix epilogue bias")
+        _check_metadata(ins,tuple(int(b) for b in reads),reads=reads,writes={str(c):c_token},
+                        sizes={str(c):rows*cols*itemsize},flops=rows*cols*(21 if activation == "gelu" else 2))
+        state[c] = ("matrix_result",index,tile,output.dtype)
+    else:
+        _check_fields(ins,location | {"tensor","slices","bank","buffer_reads"})
+        bank = attrs["bank"]
+        _context_base(bank,2,hw)
+        _require(attrs["tensor"] == node.output and attrs["slices"] == output_slices,
+                 "matrix store does not match its graph output region")
+        _require(state.get(bank) == ("matrix_result",index,tile,output.dtype), "matrix store reads an unfinished or different result tile")
+        _check_metadata(ins,(bank,),reads={str(bank):c_token},transfer=rows*cols*itemsize)
+
+
+def _vector_contract(ins, plan, specs, state):
+    attrs,hw = ins.attrs,plan.hardware
+    if ins.op == "store_group":
+        _check_fields(ins,{"tensor","bank","start","end","kind","buffer_reads"})
+        matches = [i for i,node in enumerate(plan.scheduled_nodes) if node.output == attrs["tensor"]]
+        _require(len(matches) == 1, "vector store does not target a graph output value")
+        index = matches[0]
+    else:
+        index = attrs.get("node_index")
+        _require(type(index) is int and 0 <= index < len(plan.scheduled_nodes), "invalid vector instruction node index")
+    node = plan.scheduled_nodes[index]
+    _require(node.op not in {"matmul","fused_matmul"}, "vector instruction targets a matrix graph node")
+    out = specs[node.output]
+    expected_kind = "rows" if node.op in {"softmax","layernorm"} else ("reduction" if node.op == "sum" else "flat")
+    if ins.op == "vector":
+        _check_fields(ins,{"node_index","payload_bank","output_bank","buffer_reads","buffer_writes","size_by_bank"})
+        base = _context_base(attrs["payload_bank"],0,hw)
+        payload = state.get(base)
+        _require(isinstance(payload,tuple) and len(payload) == 5 and payload[:2] == ("vector_input",index),
+                 "vector instruction reads a different graph node payload")
+        _,_,start,end,kind = payload
+        _require(attrs["output_bank"] == base+3 and all(state.get(b) == payload for b in range(base,base+3)),
+                 "vector instruction payload banks disagree")
+    else:
+        kind,start,end = attrs["kind"],attrs["start"],attrs["end"]
+        base = _context_base(attrs["payload_bank"],0,hw) if ins.op == "load_group" else _context_base(attrs["bank"],3,hw)
+    limit = out.numel // out.shape[-1] if kind == "rows" else out.numel
+    _require(kind == expected_kind and type(start) is int and type(end) is int and 0 <= start < end <= limit,
+             "vector instruction has an invalid operation region")
+    input_bytes,count = _generic_sizes(node,specs,kind,start,end)
+    input_banks = tuple(range(base,base+3))
+    output_bank = base+3
+    token_in = f"in:{node.output}:{start}"
+    token_out = f"out:{node.output}:{start}"
+    if ins.op == "load_group":
+        _check_fields(ins,{"node_index","start","end","kind","payload_bank","buffer_writes","size_by_bank"})
+        sizes = _partition_bytes(input_bytes,input_banks,hw.bank_bytes)
+        _check_metadata(ins,input_banks,writes={str(b):token_in for b in input_banks},sizes=sizes,transfer=input_bytes)
+        for bank in input_banks:
+            state[bank] = ("vector_input",index,start,end,kind)
+    elif ins.op == "vector":
+        _check_metadata(ins,(*input_banks,output_bank),reads={str(b):token_in for b in input_banks},
+                        writes={str(output_bank):token_out},sizes={str(output_bank):count*np.dtype(out.dtype).itemsize},
+                        flops=_generic_flops(node,specs,count))
+        state[output_bank] = ("vector_result",index,start,end,kind)
+    else:
+        _require(state.get(output_bank) == ("vector_result",index,start,end,kind), "vector store reads a different or unfinished result")
+        _check_metadata(ins,(output_bank,),reads={str(output_bank):token_out},transfer=count*np.dtype(out.dtype).itemsize)
+
+
 def _validate_schedule(plan: SimulatorPlan):
+    try:
+        _validate_schedule_impl(plan)
+    except ResourceError:
+        raise
+    except (AttributeError, KeyError, TypeError, ValueError, IndexError, OverflowError) as exc:
+        raise ResourceError(f"malformed simulator instruction plan: {exc}") from exc
+
+
+def _validate_schedule_impl(plan: SimulatorPlan):
     """Check dependencies, exclusive resources, SRAM contents and transfers."""
     hw=plan.hardware
     instructions=plan.instructions
@@ -356,9 +559,9 @@ def _validate_schedule(plan: SimulatorPlan):
     for index,ins in enumerate(instructions):
         if ins.id != index or ins.op not in {"load","zero","mma","epilogue","store","load_group","vector","store_group"}:
             raise ResourceError("invalid simulator instruction id or opcode")
-        if any(not isinstance(d,int) or d<0 or d>=index for d in ins.deps):
+        if any(type(d) is not int or d<0 or d>=index for d in ins.deps):
             raise ResourceError(f"instruction {index} has invalid dependency")
-        if not isinstance(ins.start_cycle,int) or not isinstance(ins.end_cycle,int) or ins.start_cycle<0 or ins.end_cycle<=ins.start_cycle:
+        if type(ins.start_cycle) is not int or type(ins.end_cycle) is not int or ins.start_cycle<0 or ins.end_cycle<=ins.start_cycle:
             raise ResourceError("instruction cycles must be nonnegative ordered integers")
         if any(instructions[d].end_cycle>ins.start_cycle for d in ins.deps):
             raise ResourceError(f"instruction {index} starts before its dependencies complete")
@@ -374,12 +577,12 @@ def _validate_schedule(plan: SimulatorPlan):
         if ins.end_cycle-ins.start_cycle < hw.instruction_setup_cycles+math.ceil(work/rate):
             raise ResourceError("instruction duration is shorter than its modeled cost")
         resource_intervals.setdefault(ins.resource,[]).append(ins)
-        if len(set(ins.banks)) != len(ins.banks) or any(not isinstance(b,int) or not 0<=b<hw.banks for b in ins.banks):
+        if len(set(ins.banks)) != len(ins.banks) or any(type(b) is not int or not 0<=b<hw.banks for b in ins.banks):
             raise ResourceError("instruction uses invalid SRAM bank")
         for b in ins.banks:
             bank_intervals.setdefault(b,[]).append(ins)
         for b,size in ins.attrs.get("size_by_bank",{}).items():
-            if int(b) not in ins.banks or not isinstance(size,int) or not 0<=size<=hw.bank_bytes:
+            if int(b) not in ins.banks or type(size) is not int or not 0<=size<=hw.bank_bytes:
                 raise ResourceError("instruction exceeds SRAM bank capacity")
         if ins.op in {"store","store_group"}:
             if ins.attrs.get("tensor") not in producers:
@@ -412,10 +615,23 @@ def _validate_schedule(plan: SimulatorPlan):
         if any(a.end_cycle>b.start_cycle for a,b in zip(ordered,ordered[1:])):
             raise ResourceError("overlapping instructions contend for a resource or SRAM bank")
     tokens={}
+    state={}
+    previous_bank_access={}
     nodes=plan.scheduled_nodes
     if {n.output for n in nodes}!=set(producers) or len(nodes)!=len(producers):
         raise ResourceError("simulator node order does not match its graph")
+    graph_nodes={node.output:node for node in plan.graph.ordered_nodes()}
+    _require(all(node.to_dict() == graph_nodes[node.output].to_dict() for node in nodes),
+             "simulator scheduled node semantics do not match its graph")
     for ins in sorted(instructions,key=lambda i:(i.start_cycle,i.id)):
+        for bank in ins.banks:
+            if bank in previous_bank_access:
+                _require(previous_bank_access[bank] in ins.deps, "instruction omits an SRAM bank reuse dependency")
+            previous_bank_access[bank]=ins.id
+        if ins.op in {"load","zero","mma","epilogue","store"}:
+            _matrix_contract(ins,plan,specs,state)
+        else:
+            _vector_contract(ins,plan,specs,state)
         for bank,token in ins.attrs.get("buffer_reads",{}).items():
             if int(bank) not in ins.banks or tokens.get(int(bank))!=token:
                 raise ResourceError(f"instruction {ins.id} reads uninitialized or overwritten SRAM")
@@ -433,6 +649,9 @@ def _validate_schedule(plan: SimulatorPlan):
         for value in reads:
             if value in producers and (not producers[value] or max(p.end_cycle for p in producers[value])>ins.start_cycle):
                 raise ResourceError(f"instruction {ins.id} reads global tensor {value} before its producer completes")
+            if value in producers:
+                _require(all(p.id in ins.deps for p in producers[value]),
+                         "instruction omits a global tensor producer dependency")
 
 
 def _gather_broadcast(array,shape,indices):
@@ -503,8 +722,8 @@ def _vector(node,payload,dtype):
         exp=np.exp(x-np.max(x,axis=-1,keepdims=True))
         return (exp/np.sum(exp,axis=-1,keepdims=True,dtype=np.float32)).astype(dtype)
     if node.op=="layernorm":
-        mean=np.mean(x,axis=-1,keepdims=True,dtype=np.float32)
-        centered=x-mean
+        delta=x-x[...,:1]
+        centered=delta-np.mean(delta,axis=-1,keepdims=True,dtype=np.float32)
         variance=np.mean(centered*centered,axis=-1,keepdims=True,dtype=np.float32)
         normalized=centered/np.sqrt(variance+np.float32(node.attrs.get("eps",1e-5)))
         return (normalized*payload[1].astype(np.float32)+payload[2].astype(np.float32)).astype(dtype)
@@ -517,8 +736,10 @@ def simulate(plan: SimulatorPlan, inputs: Mapping[str,np.ndarray]) -> dict[str,n
     graph=plan.graph
     graph.validate()
     specs=graph.specs()
+    if not isinstance(inputs,Mapping):
+        raise ExecutionError("simulator inputs must be a mapping from names to NumPy tensors")
     if set(inputs)!=set(graph.inputs):
-        raise ExecutionError(f"simulator input names must be {sorted(graph.inputs)}")
+        raise ExecutionError(f"simulator input names must be {sorted(graph.inputs)}; got {sorted(repr(k) for k in inputs)}")
     values={}
     for name,spec in graph.inputs.items():
         array=inputs[name]

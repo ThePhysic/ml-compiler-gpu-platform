@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from contextlib import ExitStack
 import gc
 import importlib.metadata
 import json
@@ -74,6 +75,8 @@ def compare_arrays(actual: dict, expected: dict, dtype: str) -> dict:
         output = np.asarray(actual[name])
         if output.shape != target.shape or output.dtype != target.dtype:
             raise ExecutionError(f"benchmark output {name}: shape/dtype mismatch")
+        if not np.all(np.isfinite(output)) or not np.all(np.isfinite(target)):
+            raise ExecutionError(f"benchmark numerical mismatch at {name}: non-finite output/reference")
         difference = np.abs(output.astype(np.float64) - target.astype(np.float64))
         if not np.allclose(output, target, equal_nan=False, **tolerance):
             raise ExecutionError(f"benchmark numerical mismatch at {name}; max absolute error {float(difference.max())}")
@@ -115,6 +118,17 @@ def _metadata(torch=None):
     result = {"timestamp_utc": datetime.now(timezone.utc).isoformat(), "os": platform.platform(),
               "python": platform.python_version(), "cpu": cpu, "machine": platform.machine(),
               "versions": versions, "nvidia_smi": _nvidia_snapshot()}
+    root = Path(__file__).resolve().parents[2]
+    if (root / ".git").exists():
+        try:
+            revision = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, check=True, timeout=5)
+            source_status = subprocess.run(["git", "status", "--porcelain", "--untracked-files=normal", "--", "src", "pyproject.toml"],
+                                           cwd=root, capture_output=True, text=True, check=True, timeout=5)
+            result["source"] = {"git_commit": revision.stdout.strip(), "implementation_dirty": bool(source_status.stdout.strip())}
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            result["source"] = {"status": "unavailable", "reason": str(exc)}
+    else:
+        result["source"] = {"status": "installed_distribution_without_git_checkout"}
     if torch is not None:
         props = torch.cuda.get_device_properties(0)
         result["gpu"] = {"name": props.name, "total_memory_bytes": props.total_memory,
@@ -396,10 +410,13 @@ def profile_graph(output_path):
     path = Path(output_path)
     report = {"schema_version": 1, "status": "running", "metadata": _metadata()}
     _write_report(path, report)
+    precision_scope = ExitStack()
     try:
         from .gpu import ensure_available
         ensure_available()
         import torch
+        from .precision import ieee_float32
+        precision_scope.enter_context(ieee_float32(torch))
         from .runtime import Program
         from .torch_reference import make_callable
         graph = workload("mlp", m=128, k=256, n=384, dtype="float32")
@@ -454,3 +471,5 @@ def profile_graph(output_path):
         report["error"] = _error(exc)
         _write_report(path, report)
         raise
+    finally:
+        precision_scope.close()

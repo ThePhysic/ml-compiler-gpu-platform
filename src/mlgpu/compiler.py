@@ -186,7 +186,7 @@ def fuse_matmul(graph: Graph) -> Graph:
         current = node
         if current.output not in outputs and len(users[current.output]) == 1:
             nxt = users[current.output][0]
-            if nxt.op == "add":
+            if nxt.op == "add" and nxt.output not in consumed:
                 candidate = nxt.inputs[1] if nxt.inputs[0] == current.output else nxt.inputs[0]
                 n = specs[current.output].shape[-1]
                 if candidate != current.output and specs[candidate].shape in {(n,), (1, n)}:
@@ -195,7 +195,7 @@ def fuse_matmul(graph: Graph) -> Graph:
                     current = nxt
         if current.output not in outputs and len(users[current.output]) == 1:
             nxt = users[current.output][0]
-            if nxt.op in {"relu", "gelu"}:
+            if nxt.op in {"relu", "gelu"} and nxt.output not in consumed:
                 chain.append(nxt)
                 activation = nxt.op
         if len(chain) < 2:
