@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.coverage
+.ruff_cache/
+.triton/
+*.ncu-rep
+*.nsys-rep
+artifacts/local/
