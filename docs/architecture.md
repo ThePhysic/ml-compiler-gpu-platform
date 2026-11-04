@@ -55,8 +55,9 @@ cross-backend compatibility guarantee. No finite-input scan runs on every dispat
 to the target, and allocates one byte arena with typed contiguous views at planned
 offsets. Inputs and constants stay external; pinned produced outputs live until
 execution finishes. Distinct bindings own independent arenas. A binding is not
-reentrant, and GPU dispatch uses the current CUDA stream. Callers must not reuse a
-binding across concurrent streams or mutate inputs while operations are in flight.
+reentrant, and GPU dispatch uses the CUDA stream captured at bind time. Running a
+binding from a different stream raises an error; bind separately in that stream.
+Callers must not mutate inputs while operations are in flight.
 
 `Program.run` includes binding and copied outputs. A bound execution's default
 `run()` also copies outputs, allowing results to survive another invocation.

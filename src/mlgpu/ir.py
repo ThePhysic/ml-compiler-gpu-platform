@@ -24,10 +24,12 @@ class TensorSpec:
     dtype: str = "float32"
 
     def __post_init__(self):
+        if not isinstance(self.shape, (tuple, list)):
+            raise GraphError("shape must be a list or tuple of positive integers")
         object.__setattr__(self, "shape", tuple(self.shape))
         if not self.shape or any(type(d) is not int or d <= 0 for d in self.shape):
             raise GraphError(f"shape must have positive static integer dimensions: {self.shape}")
-        if self.dtype not in DTYPES:
+        if not isinstance(self.dtype, str) or self.dtype not in DTYPES:
             raise GraphError(f"unsupported dtype {self.dtype!r}; supported: {tuple(DTYPES)}")
 
     @property
@@ -54,6 +56,14 @@ class Node:
     attrs: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
+        if not isinstance(self.op, str) or not self.op:
+            raise GraphError("operation name must be a nonempty string")
+        if not isinstance(self.output, str) or not self.output:
+            raise GraphError("node output must be a nonempty string")
+        if not isinstance(self.inputs, (tuple, list)) or any(not isinstance(x, str) or not x for x in self.inputs):
+            raise GraphError("node inputs must be a list or tuple of nonempty names")
+        if not isinstance(self.attrs, dict) or any(not isinstance(x, str) for x in self.attrs):
+            raise GraphError("operation attributes must be a dict with string keys")
         self.inputs = tuple(self.inputs)
 
     def to_dict(self):
@@ -95,7 +105,8 @@ def infer_node(node: Node, specs: dict[str, TensorSpec]) -> TensorSpec:
         shape = (a.shape[0], b.shape[1])
         if len(inputs) == 3 and inputs[2].shape not in {(shape[1],), (1, shape[1])}:
             raise GraphError("fused matmul bias must have shape (N,) or (1,N)")
-        if node.attrs.get("activation", "none") not in {"none", "relu", "gelu"}:
+        activation = node.attrs.get("activation", "none")
+        if not isinstance(activation, str) or activation not in {"none", "relu", "gelu"}:
             raise GraphError("unsupported fused matmul activation")
     elif node.op in {"add", "mul"}:
         shape = _broadcast(first.shape, inputs[1].shape)
@@ -138,7 +149,7 @@ def infer_node(node: Node, specs: dict[str, TensorSpec]) -> TensorSpec:
         for step in steps:
             if not isinstance(step, dict) or not {"op", "inputs", "output"} <= set(step) or set(step) - {"op", "inputs", "output", "attrs"}:
                 raise GraphError("malformed fused elementwise step")
-            sub = Node(step["op"], tuple(step["inputs"]), step["output"], step.get("attrs", {}))
+            sub = Node(step["op"], step["inputs"], step["output"], step.get("attrs", {}))
             if sub.op not in ELEMENTWISE or sub.output in local:
                 raise GraphError("fused elementwise region must be elementwise SSA")
             local[sub.output] = infer_node(sub, local)
@@ -158,6 +169,11 @@ class Graph:
     name: str = "graph"
 
     def __post_init__(self):
+        if not isinstance(self.inputs, dict) or not isinstance(self.constants, dict) or not isinstance(self.nodes, (tuple, list)):
+            raise GraphError("graph requires input/constant mappings and a node sequence")
+        if not isinstance(self.outputs, (tuple, list)) or any(not isinstance(x, str) or not x for x in self.outputs):
+            raise GraphError("graph outputs must be a list or tuple of nonempty names")
+        self.nodes = list(self.nodes)
         self.outputs = tuple(self.outputs)
 
     def ordered_nodes(self) -> list[Node]:

@@ -1,0 +1,31 @@
+name: GPU correctness (manual, provisioned CUDA runner required)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gpu:
+    runs-on: [self-hosted, linux, x64, gpu]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      # The operator provisions the NVIDIA driver and CUDA-capable hardware.
+      # Software versions match the repository's measured CUDA 12.6 environment.
+      - name: Create isolated environment
+        run: python -m venv .ci-gpu-venv
+      - name: Install the verified CUDA PyTorch build
+        run: .ci-gpu-venv/bin/python -m pip install --index-url https://download.pytorch.org/whl/cu126 'torch==2.9.1+cu126'
+      - name: Install pinned GPU environment and project
+        run: .ci-gpu-venv/bin/python -m pip install -r requirements/gpu.lock -e '.[test]'
+      - name: Require a real CUDA device and working Triton backend
+        run: .ci-gpu-venv/bin/python -m mlgpu doctor --require-gpu
+      - name: Run all correctness tests including GPU execution
+        run: .ci-gpu-venv/bin/python -m pytest -q

@@ -60,8 +60,7 @@ class BoundExecution:
                 raise ResourceError(f"runtime arena allocation failed: {exc}") from exc
         else:
             import torch
-            from .gpu import launch
-            self._launch = launch
+            from .gpu import prepare_launch
             device = torch.device(program.device)
             if device.type != "cuda":
                 raise BackendUnavailable("GPU runtime requires a CUDA device")
@@ -76,6 +75,9 @@ class BoundExecution:
             self.values = dict(inputs)
             try:
                 with torch.cuda.device(device):
+                    self._cuda_stream = torch.cuda.current_stream(device).cuda_stream
+                    self._torch = torch
+                    self._device = device
                     self.values.update({name: torch.from_numpy(a.copy()).to(device) for name, a in graph.constants.items()})
                     self.arena = torch.empty(self.plan.memory.peak_bytes, dtype=torch.uint8, device=device)
                     for name, allocation in self.plan.memory.allocations.items():
@@ -83,17 +85,20 @@ class BoundExecution:
                         self.values[name] = self.arena.narrow(0, allocation.offset, spec.nbytes).view(getattr(torch, spec.dtype)).reshape(spec.shape)
             except torch.OutOfMemoryError as exc:
                 raise ResourceError(f"CUDA runtime arena requires {self.plan.memory.peak_bytes} bytes") from exc
+            self._dispatches = [prepare_launch(node, [self.values[x] for x in node.inputs], self.values[node.output], self.plan.tiles.get(node.output)) for node in self.plan.nodes]
 
     def run(self, copy_outputs=True):
         if not self._lock.acquire(blocking=False):
             raise ExecutionError("bound execution is not reentrant; create separate bindings")
         try:
-            for node in self.plan.nodes:
+            if self.backend == "gpu" and self._torch.cuda.current_stream(self._device).cuda_stream != self._cuda_stream:
+                raise ExecutionError("bound execution belongs to its binding CUDA stream; bind separately on another stream")
+            for index, node in enumerate(self.plan.nodes):
                 try:
                     if self.backend == "reference":
                         np.copyto(self.values[node.output], evaluate_node(node, self.values))
                     else:
-                        self._launch(node, [self.values[x] for x in node.inputs], self.values[node.output], self.plan.tiles.get(node.output))
+                        self._dispatches[index]()
                 except Exception as exc:
                     if isinstance(exc, (BackendUnavailable, ResourceError)):
                         raise

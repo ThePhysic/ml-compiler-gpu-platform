@@ -1,0 +1,7 @@
+# Measured/tested Python 3.12/3.13 CPU dependency set.
+numpy==2.2.6
+pytest==8.4.2
+iniconfig==2.3.1
+packaging==26.3
+pluggy==1.7.0
+pygments==2.21.0
