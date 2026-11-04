@@ -1,0 +1,585 @@
+{
+  "schema_version": 1,
+  "status": "ok",
+  "metadata": {
+    "timestamp_utc": "2026-11-04T01:33:46.761278+00:00",
+    "os": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.12.16",
+    "cpu": "AMD Ryzen 9 7940HS w/ Radeon 780M Graphics",
+    "machine": "x86_64",
+    "versions": {
+      "numpy": "2.2.6",
+      "torch": "2.9.1+cu126",
+      "triton": "3.5.1",
+      "mlgpu": "0.1.0"
+    },
+    "nvidia_smi": {
+      "status": "ok",
+      "csv": "name, driver_version, memory.total [MiB], power.draw [W], power.limit [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz], pstate\nNVIDIA GeForce RTX 4060 Laptop GPU, 566.36, 8188 MiB, 19.26 W, [N/A], 53, 2250 MHz, 8000 MHz, P0",
+      "stderr": ""
+    },
+    "source": {
+      "git_commit": "a3c34ea86c9d2c421bfaccf0103d8515a0219624",
+      "implementation_dirty": false
+    },
+    "gpu": {
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "total_memory_bytes": 8585216000,
+      "compute_capability": [
+        8,
+        9
+      ],
+      "multiprocessors": 24,
+      "torch_cuda_version": "12.6",
+      "device": "cuda:0"
+    },
+    "precision": {
+      "matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "float32_matmul_precision": "highest"
+    }
+  },
+  "graph": {
+    "name": "mlp",
+    "inputs": {
+      "x": {
+        "shape": [
+          128,
+          256
+        ],
+        "dtype": "float32",
+        "strides": [
+          256,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w1": {
+        "shape": [
+          256,
+          384
+        ],
+        "dtype": "float32",
+        "strides": [
+          384,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b1": {
+        "shape": [
+          384
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w2": {
+        "shape": [
+          384,
+          256
+        ],
+        "dtype": "float32",
+        "strides": [
+          256,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b2": {
+        "shape": [
+          256
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      }
+    },
+    "constants": {},
+    "nodes": [
+      {
+        "op": "matmul",
+        "inputs": [
+          "x",
+          "w1"
+        ],
+        "output": "h0",
+        "attrs": {}
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "h0",
+          "b1"
+        ],
+        "output": "h1",
+        "attrs": {}
+      },
+      {
+        "op": "gelu",
+        "inputs": [
+          "h1"
+        ],
+        "output": "h2",
+        "attrs": {}
+      },
+      {
+        "op": "matmul",
+        "inputs": [
+          "h2",
+          "w2"
+        ],
+        "output": "h3",
+        "attrs": {}
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "h3",
+          "b2"
+        ],
+        "output": "h4",
+        "attrs": {}
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "h4",
+          "x"
+        ],
+        "output": "y",
+        "attrs": {}
+      }
+    ],
+    "outputs": [
+      "y"
+    ],
+    "values": {
+      "x": {
+        "shape": [
+          128,
+          256
+        ],
+        "dtype": "float32",
+        "strides": [
+          256,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w1": {
+        "shape": [
+          256,
+          384
+        ],
+        "dtype": "float32",
+        "strides": [
+          384,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b1": {
+        "shape": [
+          384
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w2": {
+        "shape": [
+          384,
+          256
+        ],
+        "dtype": "float32",
+        "strides": [
+          256,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b2": {
+        "shape": [
+          256
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h0": {
+        "shape": [
+          128,
+          384
+        ],
+        "dtype": "float32",
+        "strides": [
+          384,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h1": {
+        "shape": [
+          128,
+          384
+        ],
+        "dtype": "float32",
+        "strides": [
+          384,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h2": {
+        "shape": [
+          128,
+          384
+        ],
+        "dtype": "float32",
+        "strides": [
+          384,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h3": {
+        "shape": [
+          128,
+          256
+        ],
+        "dtype": "float32",
+        "strides": [
+          256,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h4": {
+        "shape": [
+          128,
+          256
+        ],
+        "dtype": "float32",
+        "strides": [
+          256,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "y": {
+        "shape": [
+          128,
+          256
+        ],
+        "dtype": "float32",
+        "strides": [
+          256,
+          1
+        ],
+        "layout": "contiguous"
+      }
+    }
+  },
+  "trace_file": "profile.trace.json",
+  "table_file": "profile.table.txt",
+  "operators": [
+    {
+      "name": "custom_unoptimized",
+      "count": 5,
+      "self_cpu_time_us": 3788.122999999998,
+      "total_cpu_time_us": 7664.7970000000005,
+      "total_device_time_us": 20.59400000000096,
+      "self_device_time_us": 0.0
+    },
+    {
+      "name": "Unrecognized",
+      "count": 1,
+      "self_cpu_time_us": 3033.41,
+      "total_cpu_time_us": 3033.41,
+      "total_device_time_us": 0,
+      "self_device_time_us": 0
+    },
+    {
+      "name": "cuLaunchKernelEx",
+      "count": 45,
+      "self_cpu_time_us": 1209.7430000000031,
+      "total_cpu_time_us": 1209.7430000000031,
+      "total_device_time_us": 20.59400000000096,
+      "self_device_time_us": 20.59400000000096
+    },
+    {
+      "name": "custom_unoptimized",
+      "count": 5,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 2164.277000000001,
+      "self_device_time_us": 2164.277000000001
+    },
+    {
+      "name": "matmul_epilogue",
+      "count": 20,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 467.1300000000001,
+      "self_device_time_us": 467.1300000000001
+    },
+    {
+      "name": "elementwise",
+      "count": 25,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 32.267000000000735,
+      "self_device_time_us": 32.267000000000735
+    },
+    {
+      "name": "custom_optimized",
+      "count": 5,
+      "self_cpu_time_us": 1406.9480000000003,
+      "total_cpu_time_us": 1773.4270000000006,
+      "total_device_time_us": 0,
+      "self_device_time_us": 0
+    },
+    {
+      "name": "custom_optimized",
+      "count": 5,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 856.6470000000008,
+      "self_device_time_us": 856.6470000000008
+    },
+    {
+      "name": "pytorch_eager",
+      "count": 5,
+      "self_cpu_time_us": 942.908999999996,
+      "total_cpu_time_us": 3627.3539999999994,
+      "total_device_time_us": 120.43700000000081,
+      "self_device_time_us": 0.0
+    },
+    {
+      "name": "aten::matmul",
+      "count": 10,
+      "self_cpu_time_us": 79.30899999999747,
+      "total_cpu_time_us": 1613.6670000000013,
+      "total_device_time_us": 88.20200000000023,
+      "self_device_time_us": 0.0
+    },
+    {
+      "name": "aten::mm",
+      "count": 10,
+      "self_cpu_time_us": 649.5090000000064,
+      "total_cpu_time_us": 1534.3580000000038,
+      "total_device_time_us": 88.20200000000023,
+      "self_device_time_us": 88.20200000000023
+    },
+    {
+      "name": "cudaOccupancyMaxActiveBlocksPerMultiprocessor",
+      "count": 10,
+      "self_cpu_time_us": 65.72299999999723,
+      "total_cpu_time_us": 65.72299999999723,
+      "total_device_time_us": 0,
+      "self_device_time_us": 0
+    },
+    {
+      "name": "cudaLaunchKernel",
+      "count": 40,
+      "self_cpu_time_us": 1420.0730000000003,
+      "total_cpu_time_us": 1420.0730000000003,
+      "total_device_time_us": 0,
+      "self_device_time_us": 0
+    },
+    {
+      "name": "aten::add",
+      "count": 15,
+      "self_cpu_time_us": 363.66299999999865,
+      "total_cpu_time_us": 756.1279999999997,
+      "total_device_time_us": 23.695999999999913,
+      "self_device_time_us": 23.695999999999913
+    },
+    {
+      "name": "pytorch_eager",
+      "count": 5,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 1945.8550000000005,
+      "self_device_time_us": 1945.8550000000005
+    },
+    {
+      "name": "ampere_sgemm_128x32_nn",
+      "count": 10,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 63.76799999999821,
+      "self_device_time_us": 63.76799999999821
+    },
+    {
+      "name": "void cublasLt::splitKreduce_kernel<32, 16, int, float, float, float, false, float, float, float, true, false, false>(cublasLt::cublasSplitKParams<float>, float const*, float const*, float*, float*, float const*, float const*, float const*, float const*, float*, void*, long, float*, int*, float*, float const*, float const*, float const*, float const*)",
+      "count": 10,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 24.434000000002015,
+      "self_device_time_us": 24.434000000002015
+    },
+    {
+      "name": "aten::gelu",
+      "count": 5,
+      "self_cpu_time_us": 106.1680000000033,
+      "total_cpu_time_us": 314.65000000000236,
+      "total_device_time_us": 8.53900000000067,
+      "self_device_time_us": 8.53900000000067
+    },
+    {
+      "name": "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::CUDAFunctor_add<float> >(at::TensorIteratorBase&, at::native::CUDAFunctor_add<float> const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::CUDAFunctor_add<float> >(at::TensorIteratorBase&, at::native::CUDAFunctor_add<float> const&)::{lambda(int)#1})",
+      "count": 10,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 17.331999999998516,
+      "self_device_time_us": 17.331999999998516
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase&, at::native::GeluType)::{lambda()#1}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase&, at::native::GeluType)::{lambda()#1}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "count": 5,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 8.53900000000067,
+      "self_device_time_us": 8.53900000000067
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul> >(int, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul>)",
+      "count": 5,
+      "self_cpu_time_us": 0,
+      "total_cpu_time_us": 0,
+      "total_device_time_us": 6.364000000001397,
+      "self_device_time_us": 6.364000000001397
+    },
+    {
+      "name": "cudaDeviceSynchronize",
+      "count": 6,
+      "self_cpu_time_us": 57.02700000000186,
+      "total_cpu_time_us": 57.02700000000186,
+      "total_device_time_us": 0,
+      "self_device_time_us": 0
+    }
+  ],
+  "gpu_kernel_events": 85,
+  "gpu_kernel_duration_us": 619.834,
+  "kernel_names": [
+    "ampere_sgemm_128x32_nn",
+    "elementwise",
+    "matmul_epilogue",
+    "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::CUDAFunctor_add<float> >(at::TensorIteratorBase&, at::native::CUDAFunctor_add<float> const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::CUDAFunctor_add<float> >(at::TensorIteratorBase&, at::native::CUDAFunctor_add<float> const&)::{lambda(int)#1})",
+    "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul> >(int, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul>)",
+    "void at::native::vectorized_elementwise_kernel<4, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase&, at::native::GeluType)::{lambda()#1}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::GeluCUDAKernelImpl(at::TensorIteratorBase&, at::native::GeluType)::{lambda()#1}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+    "void cublasLt::splitKreduce_kernel<32, 16, int, float, float, float, false, float, float, float, true, false, false>(cublasLt::cublasSplitKParams<float>, float const*, float const*, float*, float*, float const*, float const*, float const*, float const*, float*, void*, long, float*, int*, float*, float const*, float const*, float const*, float const*)"
+  ],
+  "profiled_repetitions": 5,
+  "kernel_resources": {
+    "custom_unoptimized": [
+      {
+        "kernel": "matmul_epilogue",
+        "registers_per_thread": 80,
+        "spill_slots": 0,
+        "shared_memory_bytes": 24576,
+        "num_warps": 8,
+        "grid": [
+          2,
+          3
+        ]
+      },
+      {
+        "kernel": "elementwise",
+        "registers_per_thread": 14,
+        "spill_slots": 0,
+        "shared_memory_bytes": 0,
+        "num_warps": 4,
+        "grid": [
+          192
+        ]
+      },
+      {
+        "kernel": "elementwise",
+        "registers_per_thread": 12,
+        "spill_slots": 0,
+        "shared_memory_bytes": 0,
+        "num_warps": 4,
+        "grid": [
+          192
+        ]
+      },
+      {
+        "kernel": "matmul_epilogue",
+        "registers_per_thread": 80,
+        "spill_slots": 2,
+        "shared_memory_bytes": 24576,
+        "num_warps": 8,
+        "grid": [
+          2,
+          2
+        ]
+      },
+      {
+        "kernel": "elementwise",
+        "registers_per_thread": 14,
+        "spill_slots": 0,
+        "shared_memory_bytes": 0,
+        "num_warps": 4,
+        "grid": [
+          128
+        ]
+      },
+      {
+        "kernel": "elementwise",
+        "registers_per_thread": 14,
+        "spill_slots": 0,
+        "shared_memory_bytes": 0,
+        "num_warps": 4,
+        "grid": [
+          128
+        ]
+      }
+    ],
+    "custom_optimized": [
+      {
+        "kernel": "matmul_epilogue",
+        "registers_per_thread": 114,
+        "spill_slots": 0,
+        "shared_memory_bytes": 24576,
+        "num_warps": 8,
+        "grid": [
+          2,
+          3
+        ]
+      },
+      {
+        "kernel": "matmul_epilogue",
+        "registers_per_thread": 80,
+        "spill_slots": 0,
+        "shared_memory_bytes": 24576,
+        "num_warps": 8,
+        "grid": [
+          2,
+          2
+        ]
+      },
+      {
+        "kernel": "elementwise",
+        "registers_per_thread": 14,
+        "spill_slots": 0,
+        "shared_memory_bytes": 0,
+        "num_warps": 4,
+        "grid": [
+          128
+        ]
+      }
+    ]
+  },
+  "limitations": "Profiler overhead affects durations. Timeline shows launch/compute behavior; no Nsight occupancy, register, DRAM transaction or utilization counters are claimed."
+}

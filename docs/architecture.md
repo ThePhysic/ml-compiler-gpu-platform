@@ -27,7 +27,7 @@ dtypes, devices, and contiguous storage.
 | matmul | (M,K) @ (K,N); no batching |
 | add, mul | broadcast-compatible static tensors |
 | relu, gelu | GELU uses tanh approximation |
-| layernorm | last axis; weight/bias vectors; finite positive eps |
+| layernorm | last axis; weight/bias vectors; positive normal finite FP32 eps |
 | softmax | last axis; stable max-subtraction |
 | sum | one integer axis, boolean keepdims; scalar outputs excluded |
 | reshape | positive static target with equal element count |
@@ -42,7 +42,11 @@ of silently changing execution. See kernel and simulator documentation.
 Matmul accumulates in FP32 and materializes its result in the declared dtype.
 Bias additions and every elementwise step round at their graph value boundary,
 including inside fused kernels. Normalization and sums reduce in FP32; normalization
-applies its affine transform in FP32 before casting. FP32 matmul requests IEEE
+first subtracts a row anchor before reducing its mean, keeping large constant rows
+exactly centered, then applies its affine transform in FP32 before casting.
+Epsilon must lie between the smallest normal positive FP32 value and FP32 maximum;
+subnormal epsilon is rejected because GPU arithmetic may flush it to zero.
+FP32 matmul requests IEEE
 input precision rather than silently enabling TF32. FP32 accumulation order and
 transcendental implementations differ across CPU/GPU, so equality is tolerance-based
 across backends. Compiler rewrites on the CPU reference must preserve exact values.
@@ -58,6 +62,11 @@ execution finishes. Distinct bindings own independent arenas. A binding is not
 reentrant, and GPU dispatch uses the CUDA stream captured at bind time. Running a
 binding from a different stream raises an error; bind separately in that stream.
 Callers must not mutate inputs while operations are in flight.
+All external source descriptors are checked on each run, including unused inputs,
+constants and direct outputs of graphs with no kernels. Shape, dtype, strides,
+storage-address or logical-view changes require rebinding; data updates are allowed.
+Constants have separate storage per binding on both backends. Logical negative and
+conjugate GPU views must be resolved before binding or independent kernel dispatch.
 
 `Program.run` includes binding and copied outputs. A bound execution's default
 `run()` also copies outputs, allowing results to survive another invocation.

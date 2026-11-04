@@ -1,0 +1,3246 @@
+{
+  "workload": "norm",
+  "dtype": "float32",
+  "shape_parameters": {
+    "m": 17,
+    "k": 31,
+    "n": 47
+  },
+  "input_ir": {
+    "name": "norm",
+    "inputs": {
+      "x": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "weight": {
+        "shape": [
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "bias": {
+        "shape": [
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "r": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      }
+    },
+    "constants": {},
+    "nodes": [
+      {
+        "op": "layernorm",
+        "inputs": [
+          "x",
+          "weight",
+          "bias"
+        ],
+        "output": "ln",
+        "attrs": {
+          "eps": 1e-05
+        }
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "ln",
+          "r"
+        ],
+        "output": "sum",
+        "attrs": {}
+      },
+      {
+        "op": "gelu",
+        "inputs": [
+          "sum"
+        ],
+        "output": "y",
+        "attrs": {}
+      }
+    ],
+    "outputs": [
+      "y"
+    ],
+    "values": {
+      "x": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "weight": {
+        "shape": [
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "bias": {
+        "shape": [
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "r": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "ln": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "sum": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "y": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      }
+    }
+  },
+  "execution_plan": {
+    "graph": {
+      "name": "norm",
+      "inputs": {
+        "x": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "weight": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "bias": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "r": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        }
+      },
+      "constants": {},
+      "nodes": [
+        {
+          "op": "layernorm",
+          "inputs": [
+            "x",
+            "weight",
+            "bias"
+          ],
+          "output": "ln",
+          "attrs": {
+            "eps": 1e-05
+          }
+        },
+        {
+          "op": "fused_elementwise",
+          "inputs": [
+            "ln",
+            "r"
+          ],
+          "output": "y",
+          "attrs": {
+            "steps": [
+              {
+                "op": "add",
+                "inputs": [
+                  "ln",
+                  "r"
+                ],
+                "output": "sum",
+                "attrs": {}
+              },
+              {
+                "op": "gelu",
+                "inputs": [
+                  "sum"
+                ],
+                "output": "y",
+                "attrs": {}
+              }
+            ]
+          }
+        }
+      ],
+      "outputs": [
+        "y"
+      ],
+      "values": {
+        "x": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "weight": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "bias": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "r": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "ln": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "y": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        }
+      }
+    },
+    "schedule": [
+      {
+        "op": "layernorm",
+        "inputs": [
+          "x",
+          "weight",
+          "bias"
+        ],
+        "output": "ln",
+        "attrs": {
+          "eps": 1e-05
+        }
+      },
+      {
+        "op": "fused_elementwise",
+        "inputs": [
+          "ln",
+          "r"
+        ],
+        "output": "y",
+        "attrs": {
+          "steps": [
+            {
+              "op": "add",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "sum",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "sum"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ]
+        }
+      }
+    ],
+    "memory": {
+      "alignment": 256,
+      "peak_bytes": 6656,
+      "naive_bytes": 6656,
+      "external_values": [
+        "x",
+        "weight",
+        "bias",
+        "r"
+      ],
+      "allocations": {
+        "ln": {
+          "offset": 0,
+          "size": 3196,
+          "start": 0,
+          "end": 1,
+          "reserved_size": 3328
+        },
+        "y": {
+          "offset": 3328,
+          "size": 3196,
+          "start": 1,
+          "end": 2,
+          "reserved_size": 3328
+        }
+      }
+    },
+    "passes": [
+      {
+        "pass": "constant_folding",
+        "changed": false,
+        "before_nodes": 3,
+        "after_nodes": 3,
+        "before": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "sum",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "sum"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "sum": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "sum",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "sum"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "sum": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "simplification",
+        "changed": false,
+        "before_nodes": 3,
+        "after_nodes": 3,
+        "before": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "sum",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "sum"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "sum": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "sum",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "sum"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "sum": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "matmul_epilogue_fusion",
+        "changed": false,
+        "before_nodes": 3,
+        "after_nodes": 3,
+        "before": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "sum",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "sum"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "sum": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "sum",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "sum"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "sum": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "elementwise_fusion",
+        "changed": true,
+        "before_nodes": 3,
+        "after_nodes": 2,
+        "before": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "sum",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "sum"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "sum": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "fused_elementwise",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "y",
+              "attrs": {
+                "steps": [
+                  {
+                    "op": "add",
+                    "inputs": [
+                      "ln",
+                      "r"
+                    ],
+                    "output": "sum",
+                    "attrs": {}
+                  },
+                  {
+                    "op": "gelu",
+                    "inputs": [
+                      "sum"
+                    ],
+                    "output": "y",
+                    "attrs": {}
+                  }
+                ]
+              }
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "dead_code_elimination",
+        "changed": false,
+        "before_nodes": 2,
+        "after_nodes": 2,
+        "before": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "fused_elementwise",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "y",
+              "attrs": {
+                "steps": [
+                  {
+                    "op": "add",
+                    "inputs": [
+                      "ln",
+                      "r"
+                    ],
+                    "output": "sum",
+                    "attrs": {}
+                  },
+                  {
+                    "op": "gelu",
+                    "inputs": [
+                      "sum"
+                    ],
+                    "output": "y",
+                    "attrs": {}
+                  }
+                ]
+              }
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "norm",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "layernorm",
+              "inputs": [
+                "x",
+                "weight",
+                "bias"
+              ],
+              "output": "ln",
+              "attrs": {
+                "eps": 1e-05
+              }
+            },
+            {
+              "op": "fused_elementwise",
+              "inputs": [
+                "ln",
+                "r"
+              ],
+              "output": "y",
+              "attrs": {
+                "steps": [
+                  {
+                    "op": "add",
+                    "inputs": [
+                      "ln",
+                      "r"
+                    ],
+                    "output": "sum",
+                    "attrs": {}
+                  },
+                  {
+                    "op": "gelu",
+                    "inputs": [
+                      "sum"
+                    ],
+                    "output": "y",
+                    "attrs": {}
+                  }
+                ]
+              }
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "weight": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "bias": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "r": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "ln": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "dependency_scheduling",
+        "changed": false,
+        "order": [
+          "ln",
+          "y"
+        ]
+      },
+      {
+        "pass": "memory_planning",
+        "changed": false,
+        "arena_bytes": 6656,
+        "naive_bytes": 6656
+      }
+    ],
+    "tiles": {}
+  },
+  "backends": {
+    "reference": {
+      "correct": true,
+      "max_absolute_error": {
+        "y": 0.0
+      },
+      "demonstration_wall_ms_including_setup": 1.4922980000164898
+    },
+    "simulator": {
+      "correct": true,
+      "max_absolute_error": {
+        "y": 0.0
+      },
+      "demonstration_wall_ms_including_setup": 5.809205999980804
+    },
+    "gpu": {
+      "correct": true,
+      "max_absolute_error": {
+        "y": 4.76837158203125e-07
+      },
+      "demonstration_wall_ms_including_setup": 129.8331389999987
+    }
+  },
+  "simulator_plan": {
+    "backend": "synthetic_tensor_accelerator",
+    "optimized": true,
+    "hardware": {
+      "local_memory_bytes": 65536,
+      "banks": 8,
+      "compute_units": 2,
+      "transfer_units": 1,
+      "flops_per_cycle_per_unit": 256,
+      "bytes_per_cycle_per_transfer": 32,
+      "instruction_setup_cycles": 4,
+      "core_clock_ghz": 1.0,
+      "max_tile": 32,
+      "bank_bytes": 8192,
+      "tile_contexts": 2,
+      "unusable_remainder_bytes": 0
+    },
+    "graph": {
+      "name": "norm",
+      "inputs": {
+        "x": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "weight": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "bias": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "r": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        }
+      },
+      "constants": {},
+      "nodes": [
+        {
+          "op": "layernorm",
+          "inputs": [
+            "x",
+            "weight",
+            "bias"
+          ],
+          "output": "ln",
+          "attrs": {
+            "eps": 1e-05
+          }
+        },
+        {
+          "op": "fused_elementwise",
+          "inputs": [
+            "ln",
+            "r"
+          ],
+          "output": "y",
+          "attrs": {
+            "steps": [
+              {
+                "op": "add",
+                "inputs": [
+                  "ln",
+                  "r"
+                ],
+                "output": "sum",
+                "attrs": {}
+              },
+              {
+                "op": "gelu",
+                "inputs": [
+                  "sum"
+                ],
+                "output": "y",
+                "attrs": {}
+              }
+            ]
+          }
+        }
+      ],
+      "outputs": [
+        "y"
+      ],
+      "values": {
+        "x": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "weight": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "bias": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "r": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "ln": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "y": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        }
+      }
+    },
+    "tiles": {
+      "ln": {
+        "output_elements": 188
+      },
+      "y": {
+        "output_elements": 256
+      }
+    },
+    "node_order": [
+      "ln",
+      "y"
+    ],
+    "instructions": [
+      {
+        "id": 0,
+        "op": "load_group",
+        "deps": [],
+        "start_cycle": 0,
+        "end_cycle": 40,
+        "resource": "dma:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 1128,
+        "flops": 0,
+        "attrs": {
+          "node_index": 0,
+          "start": 0,
+          "end": 4,
+          "kind": "rows",
+          "payload_bank": 0,
+          "buffer_writes": {
+            "0": "in:ln:0",
+            "1": "in:ln:0",
+            "2": "in:ln:0"
+          },
+          "size_by_bank": {
+            "0": 1128,
+            "1": 0,
+            "2": 0
+          }
+        }
+      },
+      {
+        "id": 1,
+        "op": "vector",
+        "deps": [
+          0
+        ],
+        "start_cycle": 40,
+        "end_cycle": 53,
+        "resource": "compute:0",
+        "banks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "transfer_bytes": 0,
+        "flops": 2256,
+        "attrs": {
+          "node_index": 0,
+          "payload_bank": 0,
+          "output_bank": 3,
+          "buffer_reads": {
+            "0": "in:ln:0",
+            "1": "in:ln:0",
+            "2": "in:ln:0"
+          },
+          "buffer_writes": {
+            "3": "out:ln:0"
+          },
+          "size_by_bank": {
+            "3": 752
+          }
+        }
+      },
+      {
+        "id": 2,
+        "op": "store_group",
+        "deps": [
+          1
+        ],
+        "start_cycle": 80,
+        "end_cycle": 108,
+        "resource": "dma:0",
+        "banks": [
+          3
+        ],
+        "transfer_bytes": 752,
+        "flops": 0,
+        "attrs": {
+          "tensor": "ln",
+          "bank": 3,
+          "start": 0,
+          "end": 4,
+          "kind": "rows",
+          "buffer_reads": {
+            "3": "out:ln:0"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "op": "load_group",
+        "deps": [],
+        "start_cycle": 40,
+        "end_cycle": 80,
+        "resource": "dma:0",
+        "banks": [
+          4,
+          5,
+          6
+        ],
+        "transfer_bytes": 1128,
+        "flops": 0,
+        "attrs": {
+          "node_index": 0,
+          "start": 4,
+          "end": 8,
+          "kind": "rows",
+          "payload_bank": 4,
+          "buffer_writes": {
+            "4": "in:ln:4",
+            "5": "in:ln:4",
+            "6": "in:ln:4"
+          },
+          "size_by_bank": {
+            "4": 1128,
+            "5": 0,
+            "6": 0
+          }
+        }
+      },
+      {
+        "id": 4,
+        "op": "vector",
+        "deps": [
+          3
+        ],
+        "start_cycle": 80,
+        "end_cycle": 93,
+        "resource": "compute:0",
+        "banks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "transfer_bytes": 0,
+        "flops": 2256,
+        "attrs": {
+          "node_index": 0,
+          "payload_bank": 4,
+          "output_bank": 7,
+          "buffer_reads": {
+            "4": "in:ln:4",
+            "5": "in:ln:4",
+            "6": "in:ln:4"
+          },
+          "buffer_writes": {
+            "7": "out:ln:4"
+          },
+          "size_by_bank": {
+            "7": 752
+          }
+        }
+      },
+      {
+        "id": 5,
+        "op": "store_group",
+        "deps": [
+          4
+        ],
+        "start_cycle": 108,
+        "end_cycle": 136,
+        "resource": "dma:0",
+        "banks": [
+          7
+        ],
+        "transfer_bytes": 752,
+        "flops": 0,
+        "attrs": {
+          "tensor": "ln",
+          "bank": 7,
+          "start": 4,
+          "end": 8,
+          "kind": "rows",
+          "buffer_reads": {
+            "7": "out:ln:4"
+          }
+        }
+      },
+      {
+        "id": 6,
+        "op": "load_group",
+        "deps": [
+          1,
+          2
+        ],
+        "start_cycle": 136,
+        "end_cycle": 176,
+        "resource": "dma:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 1128,
+        "flops": 0,
+        "attrs": {
+          "node_index": 0,
+          "start": 8,
+          "end": 12,
+          "kind": "rows",
+          "payload_bank": 0,
+          "buffer_writes": {
+            "0": "in:ln:8",
+            "1": "in:ln:8",
+            "2": "in:ln:8"
+          },
+          "size_by_bank": {
+            "0": 1128,
+            "1": 0,
+            "2": 0
+          }
+        }
+      },
+      {
+        "id": 7,
+        "op": "vector",
+        "deps": [
+          2,
+          6
+        ],
+        "start_cycle": 176,
+        "end_cycle": 189,
+        "resource": "compute:0",
+        "banks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "transfer_bytes": 0,
+        "flops": 2256,
+        "attrs": {
+          "node_index": 0,
+          "payload_bank": 0,
+          "output_bank": 3,
+          "buffer_reads": {
+            "0": "in:ln:8",
+            "1": "in:ln:8",
+            "2": "in:ln:8"
+          },
+          "buffer_writes": {
+            "3": "out:ln:8"
+          },
+          "size_by_bank": {
+            "3": 752
+          }
+        }
+      },
+      {
+        "id": 8,
+        "op": "store_group",
+        "deps": [
+          7
+        ],
+        "start_cycle": 216,
+        "end_cycle": 244,
+        "resource": "dma:0",
+        "banks": [
+          3
+        ],
+        "transfer_bytes": 752,
+        "flops": 0,
+        "attrs": {
+          "tensor": "ln",
+          "bank": 3,
+          "start": 8,
+          "end": 12,
+          "kind": "rows",
+          "buffer_reads": {
+            "3": "out:ln:8"
+          }
+        }
+      },
+      {
+        "id": 9,
+        "op": "load_group",
+        "deps": [
+          4,
+          5
+        ],
+        "start_cycle": 176,
+        "end_cycle": 216,
+        "resource": "dma:0",
+        "banks": [
+          4,
+          5,
+          6
+        ],
+        "transfer_bytes": 1128,
+        "flops": 0,
+        "attrs": {
+          "node_index": 0,
+          "start": 12,
+          "end": 16,
+          "kind": "rows",
+          "payload_bank": 4,
+          "buffer_writes": {
+            "4": "in:ln:12",
+            "5": "in:ln:12",
+            "6": "in:ln:12"
+          },
+          "size_by_bank": {
+            "4": 1128,
+            "5": 0,
+            "6": 0
+          }
+        }
+      },
+      {
+        "id": 10,
+        "op": "vector",
+        "deps": [
+          5,
+          9
+        ],
+        "start_cycle": 216,
+        "end_cycle": 229,
+        "resource": "compute:0",
+        "banks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "transfer_bytes": 0,
+        "flops": 2256,
+        "attrs": {
+          "node_index": 0,
+          "payload_bank": 4,
+          "output_bank": 7,
+          "buffer_reads": {
+            "4": "in:ln:12",
+            "5": "in:ln:12",
+            "6": "in:ln:12"
+          },
+          "buffer_writes": {
+            "7": "out:ln:12"
+          },
+          "size_by_bank": {
+            "7": 752
+          }
+        }
+      },
+      {
+        "id": 11,
+        "op": "store_group",
+        "deps": [
+          10
+        ],
+        "start_cycle": 244,
+        "end_cycle": 272,
+        "resource": "dma:0",
+        "banks": [
+          7
+        ],
+        "transfer_bytes": 752,
+        "flops": 0,
+        "attrs": {
+          "tensor": "ln",
+          "bank": 7,
+          "start": 12,
+          "end": 16,
+          "kind": "rows",
+          "buffer_reads": {
+            "7": "out:ln:12"
+          }
+        }
+      },
+      {
+        "id": 12,
+        "op": "load_group",
+        "deps": [
+          7,
+          8
+        ],
+        "start_cycle": 272,
+        "end_cycle": 294,
+        "resource": "dma:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 564,
+        "flops": 0,
+        "attrs": {
+          "node_index": 0,
+          "start": 16,
+          "end": 17,
+          "kind": "rows",
+          "payload_bank": 0,
+          "buffer_writes": {
+            "0": "in:ln:16",
+            "1": "in:ln:16",
+            "2": "in:ln:16"
+          },
+          "size_by_bank": {
+            "0": 564,
+            "1": 0,
+            "2": 0
+          }
+        }
+      },
+      {
+        "id": 13,
+        "op": "vector",
+        "deps": [
+          8,
+          12
+        ],
+        "start_cycle": 294,
+        "end_cycle": 301,
+        "resource": "compute:0",
+        "banks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "transfer_bytes": 0,
+        "flops": 564,
+        "attrs": {
+          "node_index": 0,
+          "payload_bank": 0,
+          "output_bank": 3,
+          "buffer_reads": {
+            "0": "in:ln:16",
+            "1": "in:ln:16",
+            "2": "in:ln:16"
+          },
+          "buffer_writes": {
+            "3": "out:ln:16"
+          },
+          "size_by_bank": {
+            "3": 188
+          }
+        }
+      },
+      {
+        "id": 14,
+        "op": "store_group",
+        "deps": [
+          13
+        ],
+        "start_cycle": 301,
+        "end_cycle": 311,
+        "resource": "dma:0",
+        "banks": [
+          3
+        ],
+        "transfer_bytes": 188,
+        "flops": 0,
+        "attrs": {
+          "tensor": "ln",
+          "bank": 3,
+          "start": 16,
+          "end": 17,
+          "kind": "rows",
+          "buffer_reads": {
+            "3": "out:ln:16"
+          }
+        }
+      },
+      {
+        "id": 15,
+        "op": "load_group",
+        "deps": [
+          2,
+          5,
+          8,
+          10,
+          11,
+          14
+        ],
+        "start_cycle": 311,
+        "end_cycle": 379,
+        "resource": "dma:0",
+        "banks": [
+          4,
+          5,
+          6
+        ],
+        "transfer_bytes": 2048,
+        "flops": 0,
+        "attrs": {
+          "node_index": 1,
+          "start": 0,
+          "end": 256,
+          "kind": "flat",
+          "payload_bank": 4,
+          "buffer_writes": {
+            "4": "in:y:0",
+            "5": "in:y:0",
+            "6": "in:y:0"
+          },
+          "size_by_bank": {
+            "4": 2048,
+            "5": 0,
+            "6": 0
+          }
+        }
+      },
+      {
+        "id": 16,
+        "op": "vector",
+        "deps": [
+          11,
+          15
+        ],
+        "start_cycle": 379,
+        "end_cycle": 404,
+        "resource": "compute:0",
+        "banks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "transfer_bytes": 0,
+        "flops": 5376,
+        "attrs": {
+          "node_index": 1,
+          "payload_bank": 4,
+          "output_bank": 7,
+          "buffer_reads": {
+            "4": "in:y:0",
+            "5": "in:y:0",
+            "6": "in:y:0"
+          },
+          "buffer_writes": {
+            "7": "out:y:0"
+          },
+          "size_by_bank": {
+            "7": 1024
+          }
+        }
+      },
+      {
+        "id": 17,
+        "op": "store_group",
+        "deps": [
+          16
+        ],
+        "start_cycle": 447,
+        "end_cycle": 483,
+        "resource": "dma:0",
+        "banks": [
+          7
+        ],
+        "transfer_bytes": 1024,
+        "flops": 0,
+        "attrs": {
+          "tensor": "y",
+          "bank": 7,
+          "start": 0,
+          "end": 256,
+          "kind": "flat",
+          "buffer_reads": {
+            "7": "out:y:0"
+          }
+        }
+      },
+      {
+        "id": 18,
+        "op": "load_group",
+        "deps": [
+          2,
+          5,
+          8,
+          11,
+          13,
+          14
+        ],
+        "start_cycle": 379,
+        "end_cycle": 447,
+        "resource": "dma:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 2048,
+        "flops": 0,
+        "attrs": {
+          "node_index": 1,
+          "start": 256,
+          "end": 512,
+          "kind": "flat",
+          "payload_bank": 0,
+          "buffer_writes": {
+            "0": "in:y:256",
+            "1": "in:y:256",
+            "2": "in:y:256"
+          },
+          "size_by_bank": {
+            "0": 2048,
+            "1": 0,
+            "2": 0
+          }
+        }
+      },
+      {
+        "id": 19,
+        "op": "vector",
+        "deps": [
+          14,
+          18
+        ],
+        "start_cycle": 447,
+        "end_cycle": 472,
+        "resource": "compute:0",
+        "banks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "transfer_bytes": 0,
+        "flops": 5376,
+        "attrs": {
+          "node_index": 1,
+          "payload_bank": 0,
+          "output_bank": 3,
+          "buffer_reads": {
+            "0": "in:y:256",
+            "1": "in:y:256",
+            "2": "in:y:256"
+          },
+          "buffer_writes": {
+            "3": "out:y:256"
+          },
+          "size_by_bank": {
+            "3": 1024
+          }
+        }
+      },
+      {
+        "id": 20,
+        "op": "store_group",
+        "deps": [
+          19
+        ],
+        "start_cycle": 483,
+        "end_cycle": 519,
+        "resource": "dma:0",
+        "banks": [
+          3
+        ],
+        "transfer_bytes": 1024,
+        "flops": 0,
+        "attrs": {
+          "tensor": "y",
+          "bank": 3,
+          "start": 256,
+          "end": 512,
+          "kind": "flat",
+          "buffer_reads": {
+            "3": "out:y:256"
+          }
+        }
+      },
+      {
+        "id": 21,
+        "op": "load_group",
+        "deps": [
+          2,
+          5,
+          8,
+          11,
+          14,
+          16,
+          17
+        ],
+        "start_cycle": 519,
+        "end_cycle": 587,
+        "resource": "dma:0",
+        "banks": [
+          4,
+          5,
+          6
+        ],
+        "transfer_bytes": 2048,
+        "flops": 0,
+        "attrs": {
+          "node_index": 1,
+          "start": 512,
+          "end": 768,
+          "kind": "flat",
+          "payload_bank": 4,
+          "buffer_writes": {
+            "4": "in:y:512",
+            "5": "in:y:512",
+            "6": "in:y:512"
+          },
+          "size_by_bank": {
+            "4": 2048,
+            "5": 0,
+            "6": 0
+          }
+        }
+      },
+      {
+        "id": 22,
+        "op": "vector",
+        "deps": [
+          17,
+          21
+        ],
+        "start_cycle": 587,
+        "end_cycle": 612,
+        "resource": "compute:0",
+        "banks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "transfer_bytes": 0,
+        "flops": 5376,
+        "attrs": {
+          "node_index": 1,
+          "payload_bank": 4,
+          "output_bank": 7,
+          "buffer_reads": {
+            "4": "in:y:512",
+            "5": "in:y:512",
+            "6": "in:y:512"
+          },
+          "buffer_writes": {
+            "7": "out:y:512"
+          },
+          "size_by_bank": {
+            "7": 1024
+          }
+        }
+      },
+      {
+        "id": 23,
+        "op": "store_group",
+        "deps": [
+          22
+        ],
+        "start_cycle": 614,
+        "end_cycle": 650,
+        "resource": "dma:0",
+        "banks": [
+          7
+        ],
+        "transfer_bytes": 1024,
+        "flops": 0,
+        "attrs": {
+          "tensor": "y",
+          "bank": 7,
+          "start": 512,
+          "end": 768,
+          "kind": "flat",
+          "buffer_reads": {
+            "7": "out:y:512"
+          }
+        }
+      },
+      {
+        "id": 24,
+        "op": "load_group",
+        "deps": [
+          2,
+          5,
+          8,
+          11,
+          14,
+          19,
+          20
+        ],
+        "start_cycle": 587,
+        "end_cycle": 599,
+        "resource": "dma:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 248,
+        "flops": 0,
+        "attrs": {
+          "node_index": 1,
+          "start": 768,
+          "end": 799,
+          "kind": "flat",
+          "payload_bank": 0,
+          "buffer_writes": {
+            "0": "in:y:768",
+            "1": "in:y:768",
+            "2": "in:y:768"
+          },
+          "size_by_bank": {
+            "0": 248,
+            "1": 0,
+            "2": 0
+          }
+        }
+      },
+      {
+        "id": 25,
+        "op": "vector",
+        "deps": [
+          20,
+          24
+        ],
+        "start_cycle": 599,
+        "end_cycle": 606,
+        "resource": "compute:1",
+        "banks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "transfer_bytes": 0,
+        "flops": 651,
+        "attrs": {
+          "node_index": 1,
+          "payload_bank": 0,
+          "output_bank": 3,
+          "buffer_reads": {
+            "0": "in:y:768",
+            "1": "in:y:768",
+            "2": "in:y:768"
+          },
+          "buffer_writes": {
+            "3": "out:y:768"
+          },
+          "size_by_bank": {
+            "3": 124
+          }
+        }
+      },
+      {
+        "id": 26,
+        "op": "store_group",
+        "deps": [
+          25
+        ],
+        "start_cycle": 606,
+        "end_cycle": 614,
+        "resource": "dma:0",
+        "banks": [
+          3
+        ],
+        "transfer_bytes": 124,
+        "flops": 0,
+        "attrs": {
+          "tensor": "y",
+          "bank": 3,
+          "start": 768,
+          "end": 799,
+          "kind": "flat",
+          "buffer_reads": {
+            "3": "out:y:768"
+          }
+        }
+      }
+    ],
+    "estimate": {
+      "kind": "simulated_estimate_not_hardware_measurement",
+      "cycles": 650,
+      "estimated_microseconds": 0.65,
+      "instruction_count": 27,
+      "transfer_bytes": 17860,
+      "modeled_flops": 26367,
+      "peak_local_bytes": 6144,
+      "global_storage_bytes": 13160,
+      "resource_busy_cycles": {
+        "dma:0": 636,
+        "compute:0": 134,
+        "compute:1": 7
+      },
+      "resource_utilization": {
+        "dma:0": 0.9784615384615385,
+        "compute:0": 0.20615384615384616,
+        "compute:1": 0.010769230769230769
+      }
+    }
+  },
+  "simulator_cost_estimate": {
+    "kind": "simulated_estimate_not_hardware_measurement",
+    "cycles": 650,
+    "estimated_microseconds": 0.65,
+    "instruction_count": 27,
+    "transfer_bytes": 17860,
+    "modeled_flops": 26367,
+    "peak_local_bytes": 6144,
+    "global_storage_bytes": 13160,
+    "resource_busy_cycles": {
+      "dma:0": 636,
+      "compute:0": 134,
+      "compute:1": 7
+    },
+    "resource_utilization": {
+      "dma:0": 0.9784615384615385,
+      "compute:0": 0.20615384615384616,
+      "compute:1": 0.010769230769230769
+    }
+  }
+}

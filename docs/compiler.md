@@ -25,6 +25,8 @@ An unoptimized plan retains all original operations in topological order.
    exactly one use and must not be a graph output. Fanout, repeated operands and
    full-matrix bias block the unsupported epilogue pattern. Fusion preserves the
    dtype rounding of the original matmul and bias intermediate, including FP16.
+   A region claimed by one fusion cannot be claimed by another matmul producer;
+   row-shaped matmul results can legally serve as each other's bias operands.
 4. **Elementwise fusion** recognizes linear add/multiply/ReLU/GELU regions of
    at most 16 operations. Every intermediate output has the same shape and dtype
    as the region output, one use and no public-output obligation. External
@@ -35,6 +37,8 @@ An unoptimized plan retains all original operations in topological order.
 
 The fused IR stores its original elementwise SSA steps explicitly. Lowering
 must honor those steps and cannot substitute arithmetic with different precision.
+Before/after inspection records copy nested attributes, so later rewrites cannot
+retroactively change an earlier pass's input graph.
 
 ## Dependency-aware scheduling
 

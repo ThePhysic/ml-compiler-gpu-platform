@@ -4,6 +4,9 @@ An inspectable tensor compiler with original optimization passes, a resource-con
 accelerator simulator, custom Triton kernels, and an integrated GPU runtime. It targets
 small, static MLP and transformer-style fragments on one consumer NVIDIA GPU.
 
+The [post-delivery audit](docs/audit.md) documents additional edge-case fixes and
+refreshed physical-GPU validation. Current evidence is in [artifacts/audit](artifacts/audit/).
+
 The compiler controls fusion, dependency scheduling, temporary-buffer reuse, matrix
 tile specialization, and kernel dispatch. The simulator executes emitted instructions;
 its synthetic timing model is separate from physical GPU measurements.

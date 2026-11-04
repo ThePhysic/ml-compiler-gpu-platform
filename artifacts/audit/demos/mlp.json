@@ -1,0 +1,4438 @@
+{
+  "workload": "mlp",
+  "dtype": "float16",
+  "shape_parameters": {
+    "m": 17,
+    "k": 31,
+    "n": 47
+  },
+  "input_ir": {
+    "name": "mlp",
+    "inputs": {
+      "x": {
+        "shape": [
+          17,
+          31
+        ],
+        "dtype": "float16",
+        "strides": [
+          31,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w1": {
+        "shape": [
+          31,
+          47
+        ],
+        "dtype": "float16",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b1": {
+        "shape": [
+          47
+        ],
+        "dtype": "float16",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w2": {
+        "shape": [
+          47,
+          31
+        ],
+        "dtype": "float16",
+        "strides": [
+          31,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b2": {
+        "shape": [
+          31
+        ],
+        "dtype": "float16",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      }
+    },
+    "constants": {},
+    "nodes": [
+      {
+        "op": "matmul",
+        "inputs": [
+          "x",
+          "w1"
+        ],
+        "output": "h0",
+        "attrs": {}
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "h0",
+          "b1"
+        ],
+        "output": "h1",
+        "attrs": {}
+      },
+      {
+        "op": "gelu",
+        "inputs": [
+          "h1"
+        ],
+        "output": "h2",
+        "attrs": {}
+      },
+      {
+        "op": "matmul",
+        "inputs": [
+          "h2",
+          "w2"
+        ],
+        "output": "h3",
+        "attrs": {}
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "h3",
+          "b2"
+        ],
+        "output": "h4",
+        "attrs": {}
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "h4",
+          "x"
+        ],
+        "output": "y",
+        "attrs": {}
+      }
+    ],
+    "outputs": [
+      "y"
+    ],
+    "values": {
+      "x": {
+        "shape": [
+          17,
+          31
+        ],
+        "dtype": "float16",
+        "strides": [
+          31,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w1": {
+        "shape": [
+          31,
+          47
+        ],
+        "dtype": "float16",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b1": {
+        "shape": [
+          47
+        ],
+        "dtype": "float16",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w2": {
+        "shape": [
+          47,
+          31
+        ],
+        "dtype": "float16",
+        "strides": [
+          31,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b2": {
+        "shape": [
+          31
+        ],
+        "dtype": "float16",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h0": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float16",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h1": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float16",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h2": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float16",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h3": {
+        "shape": [
+          17,
+          31
+        ],
+        "dtype": "float16",
+        "strides": [
+          31,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "h4": {
+        "shape": [
+          17,
+          31
+        ],
+        "dtype": "float16",
+        "strides": [
+          31,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "y": {
+        "shape": [
+          17,
+          31
+        ],
+        "dtype": "float16",
+        "strides": [
+          31,
+          1
+        ],
+        "layout": "contiguous"
+      }
+    }
+  },
+  "execution_plan": {
+    "graph": {
+      "name": "mlp",
+      "inputs": {
+        "x": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w1": {
+          "shape": [
+            31,
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b1": {
+          "shape": [
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w2": {
+          "shape": [
+            47,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b2": {
+          "shape": [
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        }
+      },
+      "constants": {},
+      "nodes": [
+        {
+          "op": "fused_matmul",
+          "inputs": [
+            "x",
+            "w1",
+            "b1"
+          ],
+          "output": "h2",
+          "attrs": {
+            "activation": "gelu"
+          }
+        },
+        {
+          "op": "fused_matmul",
+          "inputs": [
+            "h2",
+            "w2",
+            "b2"
+          ],
+          "output": "h4",
+          "attrs": {
+            "activation": "none"
+          }
+        },
+        {
+          "op": "add",
+          "inputs": [
+            "h4",
+            "x"
+          ],
+          "output": "y",
+          "attrs": {}
+        }
+      ],
+      "outputs": [
+        "y"
+      ],
+      "values": {
+        "x": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w1": {
+          "shape": [
+            31,
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b1": {
+          "shape": [
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w2": {
+          "shape": [
+            47,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b2": {
+          "shape": [
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "h2": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "h4": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "y": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        }
+      }
+    },
+    "schedule": [
+      {
+        "op": "fused_matmul",
+        "inputs": [
+          "x",
+          "w1",
+          "b1"
+        ],
+        "output": "h2",
+        "attrs": {
+          "activation": "gelu"
+        }
+      },
+      {
+        "op": "fused_matmul",
+        "inputs": [
+          "h2",
+          "w2",
+          "b2"
+        ],
+        "output": "h4",
+        "attrs": {
+          "activation": "none"
+        }
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "h4",
+          "x"
+        ],
+        "output": "y",
+        "attrs": {}
+      }
+    ],
+    "memory": {
+      "alignment": 256,
+      "peak_bytes": 3072,
+      "naive_bytes": 4352,
+      "external_values": [
+        "x",
+        "w1",
+        "b1",
+        "w2",
+        "b2"
+      ],
+      "allocations": {
+        "h2": {
+          "offset": 0,
+          "size": 1598,
+          "start": 0,
+          "end": 1,
+          "reserved_size": 1792
+        },
+        "h4": {
+          "offset": 1792,
+          "size": 1054,
+          "start": 1,
+          "end": 2,
+          "reserved_size": 1280
+        },
+        "y": {
+          "offset": 0,
+          "size": 1054,
+          "start": 2,
+          "end": 3,
+          "reserved_size": 1280
+        }
+      }
+    },
+    "passes": [
+      {
+        "pass": "constant_folding",
+        "changed": false,
+        "before_nodes": 6,
+        "after_nodes": 6,
+        "before": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w1"
+              ],
+              "output": "h0",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h0",
+                "b1"
+              ],
+              "output": "h1",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "h1"
+              ],
+              "output": "h2",
+              "attrs": {}
+            },
+            {
+              "op": "matmul",
+              "inputs": [
+                "h2",
+                "w2"
+              ],
+              "output": "h3",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h3",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h0": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h1": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h3": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w1"
+              ],
+              "output": "h0",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h0",
+                "b1"
+              ],
+              "output": "h1",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "h1"
+              ],
+              "output": "h2",
+              "attrs": {}
+            },
+            {
+              "op": "matmul",
+              "inputs": [
+                "h2",
+                "w2"
+              ],
+              "output": "h3",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h3",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h0": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h1": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h3": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "simplification",
+        "changed": false,
+        "before_nodes": 6,
+        "after_nodes": 6,
+        "before": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w1"
+              ],
+              "output": "h0",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h0",
+                "b1"
+              ],
+              "output": "h1",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "h1"
+              ],
+              "output": "h2",
+              "attrs": {}
+            },
+            {
+              "op": "matmul",
+              "inputs": [
+                "h2",
+                "w2"
+              ],
+              "output": "h3",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h3",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h0": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h1": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h3": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w1"
+              ],
+              "output": "h0",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h0",
+                "b1"
+              ],
+              "output": "h1",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "h1"
+              ],
+              "output": "h2",
+              "attrs": {}
+            },
+            {
+              "op": "matmul",
+              "inputs": [
+                "h2",
+                "w2"
+              ],
+              "output": "h3",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h3",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h0": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h1": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h3": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "matmul_epilogue_fusion",
+        "changed": true,
+        "before_nodes": 6,
+        "after_nodes": 3,
+        "before": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w1"
+              ],
+              "output": "h0",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h0",
+                "b1"
+              ],
+              "output": "h1",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "h1"
+              ],
+              "output": "h2",
+              "attrs": {}
+            },
+            {
+              "op": "matmul",
+              "inputs": [
+                "h2",
+                "w2"
+              ],
+              "output": "h3",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h3",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h0": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h1": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h3": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w1",
+                "b1"
+              ],
+              "output": "h2",
+              "attrs": {
+                "activation": "gelu"
+              }
+            },
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "h2",
+                "w2",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {
+                "activation": "none"
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "elementwise_fusion",
+        "changed": false,
+        "before_nodes": 3,
+        "after_nodes": 3,
+        "before": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w1",
+                "b1"
+              ],
+              "output": "h2",
+              "attrs": {
+                "activation": "gelu"
+              }
+            },
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "h2",
+                "w2",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {
+                "activation": "none"
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w1",
+                "b1"
+              ],
+              "output": "h2",
+              "attrs": {
+                "activation": "gelu"
+              }
+            },
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "h2",
+                "w2",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {
+                "activation": "none"
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "dead_code_elimination",
+        "changed": false,
+        "before_nodes": 3,
+        "after_nodes": 3,
+        "before": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w1",
+                "b1"
+              ],
+              "output": "h2",
+              "attrs": {
+                "activation": "gelu"
+              }
+            },
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "h2",
+                "w2",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {
+                "activation": "none"
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "mlp",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w1",
+                "b1"
+              ],
+              "output": "h2",
+              "attrs": {
+                "activation": "gelu"
+              }
+            },
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "h2",
+                "w2",
+                "b2"
+              ],
+              "output": "h4",
+              "attrs": {
+                "activation": "none"
+              }
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "h4",
+                "x"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w1": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b1": {
+              "shape": [
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w2": {
+              "shape": [
+                47,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b2": {
+              "shape": [
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h2": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float16",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "h4": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float16",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "dependency_scheduling",
+        "changed": false,
+        "order": [
+          "h2",
+          "h4",
+          "y"
+        ]
+      },
+      {
+        "pass": "memory_planning",
+        "changed": true,
+        "arena_bytes": 3072,
+        "naive_bytes": 4352
+      }
+    ],
+    "tiles": {
+      "h2": {
+        "block_m": 32,
+        "block_n": 64,
+        "block_k": 32,
+        "num_warps": 4
+      },
+      "h4": {
+        "block_m": 16,
+        "block_n": 32,
+        "block_k": 32,
+        "num_warps": 4
+      }
+    }
+  },
+  "backends": {
+    "reference": {
+      "correct": true,
+      "max_absolute_error": {
+        "y": 0.0
+      },
+      "demonstration_wall_ms_including_setup": 2.0369000000073356
+    },
+    "simulator": {
+      "correct": true,
+      "max_absolute_error": {
+        "y": 0.0
+      },
+      "demonstration_wall_ms_including_setup": 10.56358200000318
+    },
+    "gpu": {
+      "correct": true,
+      "max_absolute_error": {
+        "y": 0.0
+      },
+      "demonstration_wall_ms_including_setup": 432.2568999999987
+    }
+  },
+  "simulator_plan": {
+    "backend": "synthetic_tensor_accelerator",
+    "optimized": true,
+    "hardware": {
+      "local_memory_bytes": 65536,
+      "banks": 8,
+      "compute_units": 2,
+      "transfer_units": 1,
+      "flops_per_cycle_per_unit": 256,
+      "bytes_per_cycle_per_transfer": 32,
+      "instruction_setup_cycles": 4,
+      "core_clock_ghz": 1.0,
+      "max_tile": 32,
+      "bank_bytes": 8192,
+      "tile_contexts": 2,
+      "unusable_remainder_bytes": 0
+    },
+    "graph": {
+      "name": "mlp",
+      "inputs": {
+        "x": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w1": {
+          "shape": [
+            31,
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b1": {
+          "shape": [
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w2": {
+          "shape": [
+            47,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b2": {
+          "shape": [
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        }
+      },
+      "constants": {},
+      "nodes": [
+        {
+          "op": "fused_matmul",
+          "inputs": [
+            "x",
+            "w1",
+            "b1"
+          ],
+          "output": "h2",
+          "attrs": {
+            "activation": "gelu"
+          }
+        },
+        {
+          "op": "fused_matmul",
+          "inputs": [
+            "h2",
+            "w2",
+            "b2"
+          ],
+          "output": "h4",
+          "attrs": {
+            "activation": "none"
+          }
+        },
+        {
+          "op": "add",
+          "inputs": [
+            "h4",
+            "x"
+          ],
+          "output": "y",
+          "attrs": {}
+        }
+      ],
+      "outputs": [
+        "y"
+      ],
+      "values": {
+        "x": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w1": {
+          "shape": [
+            31,
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b1": {
+          "shape": [
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w2": {
+          "shape": [
+            47,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b2": {
+          "shape": [
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "h2": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float16",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "h4": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "y": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float16",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        }
+      }
+    },
+    "tiles": {
+      "h2": {
+        "block_m": 17,
+        "block_n": 32,
+        "block_k": 31
+      },
+      "h4": {
+        "block_m": 17,
+        "block_n": 31,
+        "block_k": 32
+      },
+      "y": {
+        "output_elements": 256
+      }
+    },
+    "node_order": [
+      "h2",
+      "h4",
+      "y"
+    ],
+    "instructions": [
+      {
+        "id": 0,
+        "op": "zero",
+        "deps": [],
+        "start_cycle": 0,
+        "end_cycle": 7,
+        "resource": "compute:0",
+        "banks": [
+          2
+        ],
+        "transfer_bytes": 0,
+        "flops": 544,
+        "attrs": {
+          "buffer_writes": {
+            "2": "c:h2:0:0"
+          },
+          "size_by_bank": {
+            "2": 2176
+          },
+          "shape": [
+            17,
+            32
+          ],
+          "bank": 2,
+          "node_index": 0,
+          "tile": [
+            0,
+            0,
+            17,
+            32
+          ]
+        }
+      },
+      {
+        "id": 1,
+        "op": "load",
+        "deps": [
+          0
+        ],
+        "start_cycle": 38,
+        "end_cycle": 75,
+        "resource": "dma:0",
+        "banks": [
+          0
+        ],
+        "transfer_bytes": 1054,
+        "flops": 0,
+        "attrs": {
+          "tensor": "x",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "bank": 0,
+          "buffer_writes": {
+            "0": "a:h2:0:0:0"
+          },
+          "size_by_bank": {
+            "0": 1054
+          },
+          "role": "a",
+          "depth": [
+            0,
+            31
+          ],
+          "node_index": 0,
+          "tile": [
+            0,
+            0,
+            17,
+            32
+          ]
+        }
+      },
+      {
+        "id": 2,
+        "op": "load",
+        "deps": [
+          0
+        ],
+        "start_cycle": 75,
+        "end_cycle": 141,
+        "resource": "dma:0",
+        "banks": [
+          1
+        ],
+        "transfer_bytes": 1984,
+        "flops": 0,
+        "attrs": {
+          "tensor": "w1",
+          "slices": [
+            [
+              0,
+              31
+            ],
+            [
+              0,
+              32
+            ]
+          ],
+          "bank": 1,
+          "buffer_writes": {
+            "1": "b:h2:0:0:0"
+          },
+          "size_by_bank": {
+            "1": 1984
+          },
+          "role": "b",
+          "depth": [
+            0,
+            31
+          ],
+          "node_index": 0,
+          "tile": [
+            0,
+            0,
+            17,
+            32
+          ]
+        }
+      },
+      {
+        "id": 3,
+        "op": "mma",
+        "deps": [
+          0,
+          1,
+          2
+        ],
+        "start_cycle": 141,
+        "end_cycle": 277,
+        "resource": "compute:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 0,
+        "flops": 33728,
+        "attrs": {
+          "a_bank": 0,
+          "b_bank": 1,
+          "c_bank": 2,
+          "buffer_reads": {
+            "0": "a:h2:0:0:0",
+            "1": "b:h2:0:0:0",
+            "2": "c:h2:0:0"
+          },
+          "buffer_writes": {
+            "2": "c:h2:0:0"
+          },
+          "size_by_bank": {
+            "2": 2176
+          },
+          "depth": [
+            0,
+            31
+          ],
+          "node_index": 0,
+          "tile": [
+            0,
+            0,
+            17,
+            32
+          ]
+        }
+      },
+      {
+        "id": 4,
+        "op": "load",
+        "deps": [],
+        "start_cycle": 0,
+        "end_cycle": 38,
+        "resource": "dma:0",
+        "banks": [
+          3
+        ],
+        "transfer_bytes": 1088,
+        "flops": 0,
+        "attrs": {
+          "tensor": "b1",
+          "broadcast_shape": [
+            17,
+            47
+          ],
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              32
+            ]
+          ],
+          "bank": 3,
+          "buffer_writes": {
+            "3": "bias:h2:0:0"
+          },
+          "size_by_bank": {
+            "3": 1088
+          },
+          "role": "bias",
+          "node_index": 0,
+          "tile": [
+            0,
+            0,
+            17,
+            32
+          ]
+        }
+      },
+      {
+        "id": 5,
+        "op": "epilogue",
+        "deps": [
+          3,
+          4
+        ],
+        "start_cycle": 277,
+        "end_cycle": 326,
+        "resource": "compute:0",
+        "banks": [
+          2,
+          3
+        ],
+        "transfer_bytes": 0,
+        "flops": 11424,
+        "attrs": {
+          "c_bank": 2,
+          "bias_bank": 3,
+          "dtype": "float16",
+          "activation": "gelu",
+          "buffer_reads": {
+            "2": "c:h2:0:0",
+            "3": "bias:h2:0:0"
+          },
+          "buffer_writes": {
+            "2": "c:h2:0:0"
+          },
+          "size_by_bank": {
+            "2": 1088
+          },
+          "node_index": 0,
+          "tile": [
+            0,
+            0,
+            17,
+            32
+          ]
+        }
+      },
+      {
+        "id": 6,
+        "op": "store",
+        "deps": [
+          5
+        ],
+        "start_cycle": 326,
+        "end_cycle": 364,
+        "resource": "dma:0",
+        "banks": [
+          2
+        ],
+        "transfer_bytes": 1088,
+        "flops": 0,
+        "attrs": {
+          "tensor": "h2",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              32
+            ]
+          ],
+          "bank": 2,
+          "buffer_reads": {
+            "2": "c:h2:0:0"
+          },
+          "node_index": 0,
+          "tile": [
+            0,
+            0,
+            17,
+            32
+          ]
+        }
+      },
+      {
+        "id": 7,
+        "op": "zero",
+        "deps": [],
+        "start_cycle": 0,
+        "end_cycle": 5,
+        "resource": "compute:1",
+        "banks": [
+          6
+        ],
+        "transfer_bytes": 0,
+        "flops": 255,
+        "attrs": {
+          "buffer_writes": {
+            "6": "c:h2:0:32"
+          },
+          "size_by_bank": {
+            "6": 1020
+          },
+          "shape": [
+            17,
+            15
+          ],
+          "bank": 6,
+          "node_index": 0,
+          "tile": [
+            0,
+            32,
+            17,
+            15
+          ]
+        }
+      },
+      {
+        "id": 8,
+        "op": "load",
+        "deps": [
+          7
+        ],
+        "start_cycle": 141,
+        "end_cycle": 178,
+        "resource": "dma:0",
+        "banks": [
+          4
+        ],
+        "transfer_bytes": 1054,
+        "flops": 0,
+        "attrs": {
+          "tensor": "x",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "bank": 4,
+          "buffer_writes": {
+            "4": "a:h2:0:32:0"
+          },
+          "size_by_bank": {
+            "4": 1054
+          },
+          "role": "a",
+          "depth": [
+            0,
+            31
+          ],
+          "node_index": 0,
+          "tile": [
+            0,
+            32,
+            17,
+            15
+          ]
+        }
+      },
+      {
+        "id": 9,
+        "op": "load",
+        "deps": [
+          7
+        ],
+        "start_cycle": 178,
+        "end_cycle": 212,
+        "resource": "dma:0",
+        "banks": [
+          5
+        ],
+        "transfer_bytes": 930,
+        "flops": 0,
+        "attrs": {
+          "tensor": "w1",
+          "slices": [
+            [
+              0,
+              31
+            ],
+            [
+              32,
+              47
+            ]
+          ],
+          "bank": 5,
+          "buffer_writes": {
+            "5": "b:h2:0:32:0"
+          },
+          "size_by_bank": {
+            "5": 930
+          },
+          "role": "b",
+          "depth": [
+            0,
+            31
+          ],
+          "node_index": 0,
+          "tile": [
+            0,
+            32,
+            17,
+            15
+          ]
+        }
+      },
+      {
+        "id": 10,
+        "op": "mma",
+        "deps": [
+          7,
+          8,
+          9
+        ],
+        "start_cycle": 212,
+        "end_cycle": 278,
+        "resource": "compute:1",
+        "banks": [
+          4,
+          5,
+          6
+        ],
+        "transfer_bytes": 0,
+        "flops": 15810,
+        "attrs": {
+          "a_bank": 4,
+          "b_bank": 5,
+          "c_bank": 6,
+          "buffer_reads": {
+            "4": "a:h2:0:32:0",
+            "5": "b:h2:0:32:0",
+            "6": "c:h2:0:32"
+          },
+          "buffer_writes": {
+            "6": "c:h2:0:32"
+          },
+          "size_by_bank": {
+            "6": 1020
+          },
+          "depth": [
+            0,
+            31
+          ],
+          "node_index": 0,
+          "tile": [
+            0,
+            32,
+            17,
+            15
+          ]
+        }
+      },
+      {
+        "id": 11,
+        "op": "load",
+        "deps": [],
+        "start_cycle": 212,
+        "end_cycle": 232,
+        "resource": "dma:0",
+        "banks": [
+          7
+        ],
+        "transfer_bytes": 510,
+        "flops": 0,
+        "attrs": {
+          "tensor": "b1",
+          "broadcast_shape": [
+            17,
+            47
+          ],
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              32,
+              47
+            ]
+          ],
+          "bank": 7,
+          "buffer_writes": {
+            "7": "bias:h2:0:32"
+          },
+          "size_by_bank": {
+            "7": 510
+          },
+          "role": "bias",
+          "node_index": 0,
+          "tile": [
+            0,
+            32,
+            17,
+            15
+          ]
+        }
+      },
+      {
+        "id": 12,
+        "op": "epilogue",
+        "deps": [
+          10,
+          11
+        ],
+        "start_cycle": 278,
+        "end_cycle": 303,
+        "resource": "compute:1",
+        "banks": [
+          6,
+          7
+        ],
+        "transfer_bytes": 0,
+        "flops": 5355,
+        "attrs": {
+          "c_bank": 6,
+          "bias_bank": 7,
+          "dtype": "float16",
+          "activation": "gelu",
+          "buffer_reads": {
+            "6": "c:h2:0:32",
+            "7": "bias:h2:0:32"
+          },
+          "buffer_writes": {
+            "6": "c:h2:0:32"
+          },
+          "size_by_bank": {
+            "6": 510
+          },
+          "node_index": 0,
+          "tile": [
+            0,
+            32,
+            17,
+            15
+          ]
+        }
+      },
+      {
+        "id": 13,
+        "op": "store",
+        "deps": [
+          12
+        ],
+        "start_cycle": 303,
+        "end_cycle": 323,
+        "resource": "dma:0",
+        "banks": [
+          6
+        ],
+        "transfer_bytes": 510,
+        "flops": 0,
+        "attrs": {
+          "tensor": "h2",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              32,
+              47
+            ]
+          ],
+          "bank": 6,
+          "buffer_reads": {
+            "6": "c:h2:0:32"
+          },
+          "node_index": 0,
+          "tile": [
+            0,
+            32,
+            17,
+            15
+          ]
+        }
+      },
+      {
+        "id": 14,
+        "op": "zero",
+        "deps": [
+          6,
+          13
+        ],
+        "start_cycle": 364,
+        "end_cycle": 371,
+        "resource": "compute:0",
+        "banks": [
+          2
+        ],
+        "transfer_bytes": 0,
+        "flops": 527,
+        "attrs": {
+          "buffer_writes": {
+            "2": "c:h4:0:0"
+          },
+          "size_by_bank": {
+            "2": 2108
+          },
+          "shape": [
+            17,
+            31
+          ],
+          "bank": 2,
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 15,
+        "op": "load",
+        "deps": [
+          3,
+          6,
+          13,
+          14
+        ],
+        "start_cycle": 401,
+        "end_cycle": 439,
+        "resource": "dma:0",
+        "banks": [
+          0
+        ],
+        "transfer_bytes": 1088,
+        "flops": 0,
+        "attrs": {
+          "tensor": "h2",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              32
+            ]
+          ],
+          "bank": 0,
+          "buffer_writes": {
+            "0": "a:h4:0:0:0"
+          },
+          "size_by_bank": {
+            "0": 1088
+          },
+          "role": "a",
+          "depth": [
+            0,
+            32
+          ],
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 16,
+        "op": "load",
+        "deps": [
+          3,
+          6,
+          13,
+          14
+        ],
+        "start_cycle": 439,
+        "end_cycle": 505,
+        "resource": "dma:0",
+        "banks": [
+          1
+        ],
+        "transfer_bytes": 1984,
+        "flops": 0,
+        "attrs": {
+          "tensor": "w2",
+          "slices": [
+            [
+              0,
+              32
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "bank": 1,
+          "buffer_writes": {
+            "1": "b:h4:0:0:0"
+          },
+          "size_by_bank": {
+            "1": 1984
+          },
+          "role": "b",
+          "depth": [
+            0,
+            32
+          ],
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 17,
+        "op": "mma",
+        "deps": [
+          14,
+          15,
+          16
+        ],
+        "start_cycle": 505,
+        "end_cycle": 641,
+        "resource": "compute:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 0,
+        "flops": 33728,
+        "attrs": {
+          "a_bank": 0,
+          "b_bank": 1,
+          "c_bank": 2,
+          "buffer_reads": {
+            "0": "a:h4:0:0:0",
+            "1": "b:h4:0:0:0",
+            "2": "c:h4:0:0"
+          },
+          "buffer_writes": {
+            "2": "c:h4:0:0"
+          },
+          "size_by_bank": {
+            "2": 2108
+          },
+          "depth": [
+            0,
+            32
+          ],
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 18,
+        "op": "load",
+        "deps": [
+          6,
+          13,
+          17
+        ],
+        "start_cycle": 641,
+        "end_cycle": 661,
+        "resource": "dma:0",
+        "banks": [
+          0
+        ],
+        "transfer_bytes": 510,
+        "flops": 0,
+        "attrs": {
+          "tensor": "h2",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              32,
+              47
+            ]
+          ],
+          "bank": 0,
+          "buffer_writes": {
+            "0": "a:h4:0:0:32"
+          },
+          "size_by_bank": {
+            "0": 510
+          },
+          "role": "a",
+          "depth": [
+            32,
+            15
+          ],
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 19,
+        "op": "load",
+        "deps": [
+          6,
+          13,
+          17
+        ],
+        "start_cycle": 661,
+        "end_cycle": 695,
+        "resource": "dma:0",
+        "banks": [
+          1
+        ],
+        "transfer_bytes": 930,
+        "flops": 0,
+        "attrs": {
+          "tensor": "w2",
+          "slices": [
+            [
+              32,
+              47
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "bank": 1,
+          "buffer_writes": {
+            "1": "b:h4:0:0:32"
+          },
+          "size_by_bank": {
+            "1": 930
+          },
+          "role": "b",
+          "depth": [
+            32,
+            15
+          ],
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 20,
+        "op": "mma",
+        "deps": [
+          17,
+          18,
+          19
+        ],
+        "start_cycle": 695,
+        "end_cycle": 761,
+        "resource": "compute:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 0,
+        "flops": 15810,
+        "attrs": {
+          "a_bank": 0,
+          "b_bank": 1,
+          "c_bank": 2,
+          "buffer_reads": {
+            "0": "a:h4:0:0:32",
+            "1": "b:h4:0:0:32",
+            "2": "c:h4:0:0"
+          },
+          "buffer_writes": {
+            "2": "c:h4:0:0"
+          },
+          "size_by_bank": {
+            "2": 2108
+          },
+          "depth": [
+            32,
+            15
+          ],
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 21,
+        "op": "load",
+        "deps": [
+          5,
+          6,
+          13
+        ],
+        "start_cycle": 364,
+        "end_cycle": 401,
+        "resource": "dma:0",
+        "banks": [
+          3
+        ],
+        "transfer_bytes": 1054,
+        "flops": 0,
+        "attrs": {
+          "tensor": "b2",
+          "broadcast_shape": [
+            17,
+            31
+          ],
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "bank": 3,
+          "buffer_writes": {
+            "3": "bias:h4:0:0"
+          },
+          "size_by_bank": {
+            "3": 1054
+          },
+          "role": "bias",
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 22,
+        "op": "epilogue",
+        "deps": [
+          20,
+          21
+        ],
+        "start_cycle": 761,
+        "end_cycle": 770,
+        "resource": "compute:0",
+        "banks": [
+          2,
+          3
+        ],
+        "transfer_bytes": 0,
+        "flops": 1054,
+        "attrs": {
+          "c_bank": 2,
+          "bias_bank": 3,
+          "dtype": "float16",
+          "activation": "none",
+          "buffer_reads": {
+            "2": "c:h4:0:0",
+            "3": "bias:h4:0:0"
+          },
+          "buffer_writes": {
+            "2": "c:h4:0:0"
+          },
+          "size_by_bank": {
+            "2": 1054
+          },
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 23,
+        "op": "store",
+        "deps": [
+          22
+        ],
+        "start_cycle": 770,
+        "end_cycle": 807,
+        "resource": "dma:0",
+        "banks": [
+          2
+        ],
+        "transfer_bytes": 1054,
+        "flops": 0,
+        "attrs": {
+          "tensor": "h4",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "bank": 2,
+          "buffer_reads": {
+            "2": "c:h4:0:0"
+          },
+          "node_index": 1,
+          "tile": [
+            0,
+            0,
+            17,
+            31
+          ]
+        }
+      },
+      {
+        "id": 24,
+        "op": "load_group",
+        "deps": [
+          10,
+          13,
+          23
+        ],
+        "start_cycle": 807,
+        "end_cycle": 843,
+        "resource": "dma:0",
+        "banks": [
+          4,
+          5,
+          6
+        ],
+        "transfer_bytes": 1024,
+        "flops": 0,
+        "attrs": {
+          "node_index": 2,
+          "start": 0,
+          "end": 256,
+          "kind": "flat",
+          "payload_bank": 4,
+          "buffer_writes": {
+            "4": "in:y:0",
+            "5": "in:y:0",
+            "6": "in:y:0"
+          },
+          "size_by_bank": {
+            "4": 1024,
+            "5": 0,
+            "6": 0
+          }
+        }
+      },
+      {
+        "id": 25,
+        "op": "vector",
+        "deps": [
+          12,
+          24
+        ],
+        "start_cycle": 843,
+        "end_cycle": 848,
+        "resource": "compute:0",
+        "banks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "transfer_bytes": 0,
+        "flops": 256,
+        "attrs": {
+          "node_index": 2,
+          "payload_bank": 4,
+          "output_bank": 7,
+          "buffer_reads": {
+            "4": "in:y:0",
+            "5": "in:y:0",
+            "6": "in:y:0"
+          },
+          "buffer_writes": {
+            "7": "out:y:0"
+          },
+          "size_by_bank": {
+            "7": 512
+          }
+        }
+      },
+      {
+        "id": 26,
+        "op": "store_group",
+        "deps": [
+          25
+        ],
+        "start_cycle": 879,
+        "end_cycle": 899,
+        "resource": "dma:0",
+        "banks": [
+          7
+        ],
+        "transfer_bytes": 512,
+        "flops": 0,
+        "attrs": {
+          "tensor": "y",
+          "bank": 7,
+          "start": 0,
+          "end": 256,
+          "kind": "flat",
+          "buffer_reads": {
+            "7": "out:y:0"
+          }
+        }
+      },
+      {
+        "id": 27,
+        "op": "load_group",
+        "deps": [
+          20,
+          23
+        ],
+        "start_cycle": 843,
+        "end_cycle": 879,
+        "resource": "dma:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 1024,
+        "flops": 0,
+        "attrs": {
+          "node_index": 2,
+          "start": 256,
+          "end": 512,
+          "kind": "flat",
+          "payload_bank": 0,
+          "buffer_writes": {
+            "0": "in:y:256",
+            "1": "in:y:256",
+            "2": "in:y:256"
+          },
+          "size_by_bank": {
+            "0": 1024,
+            "1": 0,
+            "2": 0
+          }
+        }
+      },
+      {
+        "id": 28,
+        "op": "vector",
+        "deps": [
+          22,
+          27
+        ],
+        "start_cycle": 879,
+        "end_cycle": 884,
+        "resource": "compute:0",
+        "banks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "transfer_bytes": 0,
+        "flops": 256,
+        "attrs": {
+          "node_index": 2,
+          "payload_bank": 0,
+          "output_bank": 3,
+          "buffer_reads": {
+            "0": "in:y:256",
+            "1": "in:y:256",
+            "2": "in:y:256"
+          },
+          "buffer_writes": {
+            "3": "out:y:256"
+          },
+          "size_by_bank": {
+            "3": 512
+          }
+        }
+      },
+      {
+        "id": 29,
+        "op": "store_group",
+        "deps": [
+          28
+        ],
+        "start_cycle": 899,
+        "end_cycle": 919,
+        "resource": "dma:0",
+        "banks": [
+          3
+        ],
+        "transfer_bytes": 512,
+        "flops": 0,
+        "attrs": {
+          "tensor": "y",
+          "bank": 3,
+          "start": 256,
+          "end": 512,
+          "kind": "flat",
+          "buffer_reads": {
+            "3": "out:y:256"
+          }
+        }
+      },
+      {
+        "id": 30,
+        "op": "load_group",
+        "deps": [
+          23,
+          25,
+          26
+        ],
+        "start_cycle": 919,
+        "end_cycle": 925,
+        "resource": "dma:0",
+        "banks": [
+          4,
+          5,
+          6
+        ],
+        "transfer_bytes": 60,
+        "flops": 0,
+        "attrs": {
+          "node_index": 2,
+          "start": 512,
+          "end": 527,
+          "kind": "flat",
+          "payload_bank": 4,
+          "buffer_writes": {
+            "4": "in:y:512",
+            "5": "in:y:512",
+            "6": "in:y:512"
+          },
+          "size_by_bank": {
+            "4": 60,
+            "5": 0,
+            "6": 0
+          }
+        }
+      },
+      {
+        "id": 31,
+        "op": "vector",
+        "deps": [
+          26,
+          30
+        ],
+        "start_cycle": 925,
+        "end_cycle": 930,
+        "resource": "compute:0",
+        "banks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "transfer_bytes": 0,
+        "flops": 15,
+        "attrs": {
+          "node_index": 2,
+          "payload_bank": 4,
+          "output_bank": 7,
+          "buffer_reads": {
+            "4": "in:y:512",
+            "5": "in:y:512",
+            "6": "in:y:512"
+          },
+          "buffer_writes": {
+            "7": "out:y:512"
+          },
+          "size_by_bank": {
+            "7": 30
+          }
+        }
+      },
+      {
+        "id": 32,
+        "op": "store_group",
+        "deps": [
+          31
+        ],
+        "start_cycle": 930,
+        "end_cycle": 935,
+        "resource": "dma:0",
+        "banks": [
+          7
+        ],
+        "transfer_bytes": 30,
+        "flops": 0,
+        "attrs": {
+          "tensor": "y",
+          "bank": 7,
+          "start": 512,
+          "end": 527,
+          "kind": "flat",
+          "buffer_reads": {
+            "7": "out:y:512"
+          }
+        }
+      }
+    ],
+    "estimate": {
+      "kind": "simulated_estimate_not_hardware_measurement",
+      "cycles": 935,
+      "estimated_microseconds": 0.935,
+      "instruction_count": 33,
+      "transfer_bytes": 18000,
+      "modeled_flops": 118762,
+      "peak_local_bytes": 9816,
+      "global_storage_bytes": 10744,
+      "resource_busy_cycles": {
+        "compute:0": 425,
+        "dma:0": 645,
+        "compute:1": 96
+      },
+      "resource_utilization": {
+        "compute:0": 0.45454545454545453,
+        "dma:0": 0.6898395721925134,
+        "compute:1": 0.10267379679144385
+      }
+    }
+  },
+  "simulator_cost_estimate": {
+    "kind": "simulated_estimate_not_hardware_measurement",
+    "cycles": 935,
+    "estimated_microseconds": 0.935,
+    "instruction_count": 33,
+    "transfer_bytes": 18000,
+    "modeled_flops": 118762,
+    "peak_local_bytes": 9816,
+    "global_storage_bytes": 10744,
+    "resource_busy_cycles": {
+      "compute:0": 425,
+      "dma:0": 645,
+      "compute:1": 96
+    },
+    "resource_utilization": {
+      "compute:0": 0.45454545454545453,
+      "dma:0": 0.6898395721925134,
+      "compute:1": 0.10267379679144385
+    }
+  }
+}

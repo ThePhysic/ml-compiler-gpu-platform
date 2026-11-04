@@ -64,6 +64,12 @@ A consumer loads a tensor only after all producer tiles have been stored; the
 model does not assume inter-operation tile pipelining. A validator checks
 dependency completion, resource/bank exclusivity, bank capacities, SRAM value
 identity, producer completion, and complete, non-overlapping output stores.
+Opcode operands are checked against graph semantics rather than trusting declared
+metadata: source tensors/slices, tile/depth/role annotations, banks, value tokens,
+byte counts and arithmetic work must agree. Validation tracks accumulator depth,
+result phase and generic payload identity, and checks explicit bank-reuse/global
+producer dependencies. Missing or malformed fields raise `ResourceError`.
+Inspection dictionaries are detached from live plans.
 
 `simulate(plan, inputs)` executes this emitted stream in schedule order. Its
 matrix multiplications use only loaded tiles, and its vector instructions use
@@ -72,6 +78,8 @@ Inputs are checked for exact names, shape, dtype, and contiguous layout. FP16
 matmul results are rounded before bias and again before activation, preserving
 the original graph's materialization semantics. Tiled FP32 summation can differ
 slightly from a full BLAS multiplication because reduction order differs.
+LayerNorm translates each row by its first element before mean reduction to avoid
+large-offset cancellation, matching the updated reference and GPU algorithm.
 
 ## Cost assumptions and inspection
 

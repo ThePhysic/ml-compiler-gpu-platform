@@ -1,0 +1,83 @@
+{
+  "started_utc": "2026-11-04T01:30:44.583011+00:00",
+  "status": "ok",
+  "stages": [
+    {
+      "command": [
+        "-m",
+        "pytest",
+        "tests",
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "--junitxml=/mnt/c/Users/ridle/ml-compiler-gpu-platform/artifacts/audit/tests.xml"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 14.193095433
+    },
+    {
+      "command": [
+        "-m",
+        "mlgpu",
+        "doctor",
+        "--require-gpu",
+        "--output",
+        "/mnt/c/Users/ridle/ml-compiler-gpu-platform/artifacts/audit/environment.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.375805375999999
+    },
+    {
+      "command": [
+        "-m",
+        "mlgpu",
+        "benchmark",
+        "--quick",
+        "--output",
+        "/mnt/c/Users/ridle/ml-compiler-gpu-platform/artifacts/audit/benchmarks.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 123.572802604
+    },
+    {
+      "command": [
+        "-m",
+        "mlgpu",
+        "microbenchmark",
+        "--output",
+        "/mnt/c/Users/ridle/ml-compiler-gpu-platform/artifacts/audit/microbenchmarks.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 35.35348363899999
+    },
+    {
+      "command": [
+        "-m",
+        "mlgpu",
+        "profile",
+        "--output",
+        "/mnt/c/Users/ridle/ml-compiler-gpu-platform/artifacts/audit/profile.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.979027021000007
+    },
+    {
+      "command": [
+        "scripts/capture_demos.py",
+        "--output-directory",
+        "/mnt/c/Users/ridle/ml-compiler-gpu-platform/artifacts/audit/demos"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.712401156999988
+    },
+    {
+      "command": [
+        "scripts/capture_simulator.py",
+        "--output",
+        "/mnt/c/Users/ridle/ml-compiler-gpu-platform/artifacts/audit/simulator.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.7430834399999924
+    }
+  ]
+}

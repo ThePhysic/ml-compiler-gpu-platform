@@ -1,5 +1,9 @@
 # Validation evidence
 
+Original study artifacts are preserved here. Refreshed post-audit tests,
+benchmarks, profiles and demonstrations are in [audit/](audit/); see the
+[audit findings](../docs/audit.md) for fixes and current validation.
+
 These files were generated on the actual RTX 4060 Laptop GPU in WSL2. The simulator
 file is explicitly synthetic; it is not a GPU timing measurement.
 

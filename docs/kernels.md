@@ -11,7 +11,7 @@ explicitly selected, so the compiler and simulator work without GPU packages.
 |---|---|---|
 | add/mul/activation chain | A bounded SSA region in one memory pass; external broadcast indexing and register-resident intermediates | Memory traffic versus integer indexing and register pressure |
 | softmax | One CTA per row; masked, centered FP32 max/exp/sum | Row width, tail padding, warp count, numerical stability |
-| layernorm | One CTA per row; centered FP32 two-pass variance and affine epilogue | Reduction width, constant rows, padding and variance stability |
+| layernorm | One CTA per row; translated FP32 mean, centered variance and affine epilogue | Reduction width, large offsets, padding and variance stability |
 | matmul | Configurable rectangular M/N/K tiles; FP32 accumulation | Tile dimensions, irregular dimension waste, warps, FP32 versus FP16 |
 | matmul + bias + activation | The same dot loop and a register-resident epilogue | Launch count, eliminated writes, precision boundary preservation |
 | sum | One CTA per output scalar, arbitrary single axis of a contiguous tensor | Coalesced final-axis versus strided non-final-axis loads |
@@ -34,6 +34,11 @@ host TF32 defaults cannot silently alter its precision. GELU uses the documented
 project-wide tanh approximation, not the exact erf variant.
 ReLU explicitly propagates NaNs to match the reference; Triton's default
 `maximum` NaN policy would otherwise differ.
+LayerNorm subtracts the first element of each row before reducing its mean. This
+avoids a rounded sum of a large constant offset producing a false normalized value.
+Tests include constant rows near 2^24 and independent FP64 oracles for variations
+around large offsets. Epsilon must be positive, normal and finite in FP32;
+subnormal values can flush to zero in GPU reciprocal-square-root arithmetic.
 
 ## Bounds and failure behavior
 
@@ -41,6 +46,8 @@ The public `launch(node, inputs, output, config=None)` API validates shapes,
 dtype, device, contiguity, and output/input storage overlap even for independent
 kernel callers. It writes into a supplied tensor and returns `None`; kernels
 run asynchronously on the current CUDA stream.
+Logical negative/conjugate views are rejected because their raw storage does not
+represent the exposed tensor values. Prepared descriptors include those flags.
 
 The runtime uses `prepare_launch` at binding time to validate the graph node
 once and freeze all index/configuration metadata into a zero-argument dispatch
@@ -63,6 +70,9 @@ can reference seventeen distinct graph inputs without losing fusion legality.
 Matmul accepts only 2D `(M,K) @ (K,N)` and a fused bias of `(N,)` or `(1,N)`.
 Activation is none, ReLU, or tanh GELU. Invalid cases produce explicit errors;
 there is no arithmetic fallback.
+The two-dimensional matmul launch also requires `ceil(N / block_n) <= 65535`,
+CUDA's Y-grid bound. Larger grids raise `ResourceError` before launch; choose a
+wider legal column tile or reduce the matrix width.
 
 The default dot tile is 32x64x32 with 4 warps. Legal overrides use M/N tile
 dimensions in {16,32,64,128}, K in {16,32,64}, and warps in {4,8}. A conservative

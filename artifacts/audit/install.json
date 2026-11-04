@@ -1,0 +1,30 @@
+{
+  "status": "ok",
+  "python": "3.12.15",
+  "mlgpu": "0.1.0",
+  "numpy": "2.2.6",
+  "pytest": "8.4.2",
+  "installed_module": "C:\\Users\\ridle\\ml-compiler-gpu-platform\\artifacts\\local\\cpu-wheel-env\\Lib\\site-packages\\mlgpu\\__init__.py",
+  "source_modules_verified": [
+    "mlgpu/__init__.py",
+    "mlgpu/__main__.py",
+    "mlgpu/benchmark.py",
+    "mlgpu/cli.py",
+    "mlgpu/compiler.py",
+    "mlgpu/errors.py",
+    "mlgpu/examples.py",
+    "mlgpu/ir.py",
+    "mlgpu/microbench.py",
+    "mlgpu/precision.py",
+    "mlgpu/reference.py",
+    "mlgpu/runtime.py",
+    "mlgpu/simulator.py",
+    "mlgpu/torch_reference.py",
+    "mlgpu/gpu/__init__.py",
+    "mlgpu/gpu/kernels.py"
+  ],
+  "wheel_sha256": "ca8cb738dcf96df66f1a02c5b0c9e88fa0bcc98d05ee019fa6ce006c55e92837",
+  "source_commit": "a3c34ea86c9d2c421bfaccf0103d8515a0219624",
+  "cpu_test_evidence": "cpu-wheel-tests.xml",
+  "dependency_check": "uv pip check: all installed packages compatible"
+}

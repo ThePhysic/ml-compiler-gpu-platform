@@ -1,5 +1,10 @@
 # Measured results and engineering analysis
 
+This page preserves the original experimental study. The subsequent
+[post-delivery audit](audit.md) fixes additional compiler/runtime/numerical edge
+cases and records refreshed evidence in `artifacts/audit/`, including the updated
+LayerNorm kernel. Original timings below describe the original implementation.
+
 These experiments ran on November 3, 2026 (Los Angeles time), on an RTX 4060
 Laptop GPU with 8,188 MiB reported memory, compute capability 8.9 and 24 SMs.
 The host CPU is a Ryzen 9 7940HS. Execution used WSL2 Ubuntu, NVIDIA driver
