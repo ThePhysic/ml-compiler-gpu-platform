@@ -3,6 +3,8 @@
 Original study artifacts are preserved here. Refreshed post-audit tests,
 benchmarks, profiles and demonstrations are in [audit/](audit/); see the
 [audit findings](../docs/audit.md) for fixes and current validation.
+Start with [current results](../docs/current-results.md) for the refreshed study
+or [historical results](../docs/results.md) for the original measurements below.
 
 These files were generated on the actual RTX 4060 Laptop GPU in WSL2. The simulator
 file is explicitly synthetic; it is not a GPU timing measurement.

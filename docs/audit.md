@@ -1,5 +1,10 @@
 # Post-delivery correctness audit
 
+See [current results](current-results.md) for a readable summary of the refreshed
+measurements and their field-level provenance; [results.md](results.md) preserves
+the historical study. The counts and GPU outcomes here are existing recorded
+evidence, not a new hardware-validation run during documentation polish.
+
 The second audit found real defects beyond the original passing suite and review.
 The original 277-test result remains valid historical evidence; it did not cover
 the cases below. The core fixes and 96 additional regressions are in source
@@ -30,7 +35,7 @@ costs or counts. Manually altered plans must obey that instruction schema.
 ## Validation
 
 The expanded physical-GPU suite passed **385 tests**, with no skips or failures.
-The CPU subset passed 237 tests. Independent exploratory checks covered 2,000
+The CPU subset passed 237 tests. Additional automated exploratory checks covered 2,000
 randomized compiler DAGs, shuffled orders, both precisions, branches, multiple
 outputs and recompilation; simulator experiments covered 80 shape/dtype/hardware
 combinations. Dedicated tests cover large-offset numerical oracles, logical views,
@@ -59,9 +64,11 @@ coupled backend state. Flags now restore first and the named mode restores last
 in the profiler context and both benchmark entrypoints. Real-PyTorch tests cover
 all three modes and exception exits, supplementing the earlier mock test.
 
-The final Astra medium rereview is **clean, with no remaining complaints** for
-source `020c779`. Its independent checks and the original review history are
-recorded in [review.md](review.md).
+The recorded automated adversarial model rereview used `gpt-6-astra` at medium
+reasoning effort and reported **clean, with no remaining complaints** for source
+`020c779`. Its separately delegated checks and defect history are recorded in
+[review.md](review.md). This was not human review; the tests, regressions and
+numerical oracles are the substantive correctness evidence.
 
 Reproduce the hardware evidence in an installed CUDA environment:
 

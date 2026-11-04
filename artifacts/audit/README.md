@@ -1,5 +1,9 @@
 # Refreshed post-audit evidence
 
+Start with [current results](../../docs/current-results.md) for interpretation,
+comparison scopes and exact field selectors. These are preserved recorded runs;
+CPU-only validation during documentation work does not refresh this GPU evidence.
+
 Measured execution source: `a3c34ea86c9d2c421bfaccf0103d8515a0219624`.
 Benchmark/profile metadata records it with `implementation_dirty=false`.
 Final correctness/installed-wheel source: `020c779eadf7cb55a42a4e9208a19293028e4d59`.
@@ -24,3 +28,8 @@ implementation, including translated-mean LayerNorm and stricter runtime checks.
 The original study remains in the parent directory as historical evidence.
 Performance variability and timing boundaries remain as documented; no new
 universal speedup claims are made.
+
+`verification.json` contains historical machine-specific absolute paths. Those
+records remain unchanged. A future capture-format update could record relative
+paths, but changing scripts or rewriting historical artifacts is outside this
+documentation-only polish.

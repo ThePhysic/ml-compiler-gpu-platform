@@ -15,14 +15,38 @@ or WSL CUDA environment. Test success with GPU skips is CPU evidence only.
 | Explicit unsupported/error cases | all layers | negative tests and nonzero CLI exit |
 | Three independently runnable stories | `mlgpu` CLI | inspect, kernel benchmark/profile, demo --backend all |
 | Numerical and performance evidence | benchmark module | checked-in raw JSON and results report |
-| Private publication and clean Astra review | final git commit and review evidence | verified private remote head and explicit clean verdict |
+| Traceable validation and review history | source hashes, regressions and recorded reports | [385-test report](../artifacts/audit/tests.xml), [automated model-review history](review.md) |
 
 The required demonstrations are `epilogue`, `norm`, and `mlp`. `softmax`,
 `elementwise`, and isolated `matmul` provide extra kernel experiments.
 Importer, attention, autograd, arbitrary dynamic shapes, and LLM-platform integration
 are explicitly outside this implementation's core acceptance.
 
+The initial delivery workflow included private GitHub publication. That is a
+historical delivery event, not a current technical acceptance criterion for this
+public repository. Source hashes and reproducible evidence identify what was
+tested; automated model-review verdicts supplement those checks.
+
+## CPU and GPU validation are separate
+
+The [hosted CPU workflow](../.github/workflows/ci.yml) checks Python 3.10, 3.12 and
+3.13 without GPU execution. The [GPU workflow](../.github/workflows/gpu.yml) is a
+manual dispatch for an operator-provisioned self-hosted CUDA runner. The committed
+physical-GPU evidence comes from the recorded RTX 4060 Laptop GPU / WSL2 runs;
+hosted CPU CI and skipped GPU tests do not replace it.
+
 ## Reproduce
+
+CPU inspection and correctness checks:
+
+```bash
+python -m pytest -m 'not gpu'
+mlgpu inspect --workload epilogue
+```
+
+In a configured NVIDIA Linux/WSL2 environment, the following commands reproduce
+GPU demonstrations and experiments; they do not describe new runs made during
+documentation polish:
 
 ```bash
 mlgpu doctor --require-gpu
@@ -36,5 +60,6 @@ mlgpu profile --output artifacts/local/profile.json
 ```
 
 Committed evidence identifies the machine and versions used. See
-[measured results](results.md) and the committed artifacts for the actual validation
-outcome. Independent Astra review is recorded separately after its completion.
+[current results](current-results.md), the [historical study](results.md), and the
+committed artifacts for recorded outcomes. The [automated adversarial model-review
+history](review.md) retains defects, fixes and retests without implying human review.

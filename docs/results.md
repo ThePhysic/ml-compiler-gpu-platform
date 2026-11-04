@@ -1,5 +1,6 @@
-# Measured results and engineering analysis
+# Historical results: original experimental study
 
+For the refreshed post-audit measurements, see [current results](current-results.md).
 This page preserves the original experimental study. The subsequent
 [post-delivery audit](audit.md) fixes additional compiler/runtime/numerical edge
 cases and records refreshed evidence in `artifacts/audit/`, including the updated
@@ -147,8 +148,9 @@ the published model and assumptions, not calibrated commercial hardware behavior
 environment. `scripts/capture_demos.py`, `scripts/capture_simulator.py`, and
 `scripts/summarize_results.py` reproduce their respective artifacts/tables. The
 [derived summary](../artifacts/summary.json) retains case names linking to raw data.
-Requirements lock files record the measured environment. Source, commit history
-and evidence are published together after independent review.
+Requirements lock files record the measured environment. The study's source,
+commit history and evidence remain available alongside its later audit and
+[automated model-review history](review.md).
 
 Only one physical GPU was evaluated. Inputs/shapes are bounded, captures reuse
 buffers, laptop power limits were not controlled, and some sample CVs exceed 1.

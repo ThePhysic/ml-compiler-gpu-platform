@@ -1,72 +1,129 @@
 # ML Compiler & GPU Execution Platform
 
-An inspectable tensor compiler with original optimization passes, a resource-constrained
-accelerator simulator, custom Triton kernels, and an integrated GPU runtime. It targets
-small, static MLP and transformer-style fragments on one consumer NVIDIA GPU.
+A **Python-based tensor compiler** that takes static MLP-style graphs through an
+original typed IR, optimization passes, scheduling, tiling and buffer planning.
+Execute the result through custom Triton kernels on an NVIDIA GPU or an
+independently executable, resource-constrained accelerator simulator. Inspect how
+compiler decisions affect correctness, memory use and measured execution time.
 
-The [post-delivery audit](docs/audit.md) documents additional edge-case fixes and
-refreshed physical-GPU validation. Current evidence is in [artifacts/audit](artifacts/audit/).
+- **Compiler engineering:** legal fusion, dependency-aware scheduling and lifetime-based arena reuse, with before/after IR and inspectable execution plans.
+- **Accelerator backend:** emitted DMA/compute instructions, banked SRAM constraints and a functional interpreter with a separate synthetic cost model.
+- **GPU engineering:** original Triton kernels, precision-preserving epilogues and an integrated graph runtime, checked against NumPy/PyTorch references.
 
-The compiler controls fusion, dependency scheduling, temporary-buffer reuse, matrix
-tile specialization, and kernel dispatch. The simulator executes emitted instructions;
-its synthetic timing model is separate from physical GPU measurements.
+```mermaid
+flowchart TD
+    G[Static tensor graph] --> IR[Typed IR and validation]
+    IR --> P[Optimization passes]
+    P --> PLAN[Schedule, tile and arena plan]
+    PLAN --> GPU[Custom Triton kernels and GPU runtime]
+    PLAN --> ISA[Emitted accelerator instructions]
+    ISA --> SIM[Functional simulator and synthetic cost model]
+    G -. same workload .-> REF[Independent NumPy and PyTorch references]
+    GPU --> E[Correctness checks and evaluation]
+    SIM --> E
+    REF --> E
+```
 
-## CPU setup and demos
+## Recorded evidence: wins and losses
 
-Python 3.10+ is supported; the tested GPU environment uses Python 3.12.
+The committed audit records **385 passing CPU/GPU tests, zero skipped**, on an
+RTX 4060 Laptop GPU under WSL2, plus **237 CPU tests from an isolated installed
+wheel**. The runtime study has **48 cases** with custom, PyTorch eager and Inductor
+comparisons. These are existing reports, separate from hosted CPU CI.
+
+| Medium workload on that RTX 4060 Laptop GPU | Custom / PyTorch eager median | What it shows |
+| --- | ---: | --- |
+| Fused elementwise, FP16, 128 x 384 | 1.472 / 5.264 us | Lower custom device-region median |
+| Matmul, FP16, 128 x 256 @ 256 x 384 | 7.104 / 3.647 us | Vendor-backed eager matmul wins |
+| MLP + residual, FP16, M=128, K=256, N=384 | 330.320 / 263.264 us | Custom optimized bound host execution loses despite 6 -> 3 launches |
+
+The first two rows are **hot-cache, repeated fixed-input CUDA Graph device-region
+medians**: they exclude JIT, ordinary host dispatch, allocation and transfers.
+The MLP row is **bound, synchronized host latency** with resident GPU inputs;
+custom execution borrows preallocated outputs, while eager includes its normal
+output allocations. These scopes are distinct and timing variability is material.
+See [current results and exact artifact fields](docs/current-results.md) for both
+precisions, source commits, raw samples and limitations. Simulator cycles are synthetic estimates.
+Performance was measured at `a3c34ea`; final correctness-state validation uses
+`020c779`. The later change restores caller precision after measurements.
+
+## CPU quickstart
+
+From the repository root, with Python 3.10+. The block uses Linux/WSL activation;
+on PowerShell, replace that line with `.venv\Scripts\Activate.ps1`.
 
 ```bash
 python -m venv .venv
-# Linux/WSL: source .venv/bin/activate
-# PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install -e '.[test]'
+source .venv/bin/activate
+python -m pip install -r requirements/cpu.lock -e .
 python -m pytest -m 'not gpu'
 mlgpu inspect --workload epilogue --output artifacts/local/ir.json
 mlgpu demo --backend reference --workload mlp
 mlgpu demo --backend simulator --workload epilogue
 ```
 
-## GPU setup
+[Hosted CI](.github/workflows/ci.yml) covers CPU validation on Python 3.10, 3.12
+and 3.13. CPU success and skipped GPU cases do not validate physical GPU execution.
 
-Use Linux or WSL2 with an NVIDIA driver and CUDA-enabled PyTorch. Native Windows
-Triton is outside the supported environment. The project does not install drivers
-or change power settings. The tested pins use CUDA 12.6 wheels compatible with the
-development machine's driver; another machine must verify its driver compatibility.
+## NVIDIA GPU quickstart: Linux or WSL2
+
+Use a fresh Python 3.12 environment and a compatible NVIDIA driver. The measured
+configuration used driver 566.36, CUDA 12.6 PyTorch wheels and Triton 3.5.1;
+check driver compatibility on another machine. Native Windows Triton is outside
+the supported environment. No driver or power-setting changes are required by these commands.
 
 ```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
 python -m pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cu126
-python -m pip install -e '.[test]'
+python -m pip install -r requirements/gpu.lock -e .
 mlgpu doctor --require-gpu
 python -m pytest
-mlgpu demo --backend all --workload epilogue
-mlgpu demo --backend all --workload norm
-mlgpu demo --backend all --workload mlp --dtype float16
-mlgpu benchmark --quick --output artifacts/local/benchmarks.json
-mlgpu microbenchmark --output artifacts/local/microbenchmarks.json
-mlgpu profile --output artifacts/local/profile.json
 ```
 
-For the exact measured dependency versions, use `requirements/gpu.lock` after
-installing the CUDA PyTorch wheel from its explicit index. GPU tests skip when the
-backend is unavailable; `doctor --require-gpu` and GPU demos fail instead. A CPU-only
-test result cannot establish completion of GPU validation.
+[GPU CI](.github/workflows/gpu.yml) is manual and requires a provisioned
+self-hosted CUDA runner; it is not automatic hosted GPU coverage.
 
-## Engineering demonstrations
+## Three runnable engineering stories
 
-1. **Compiler:** `inspect` shows typed IR, pass-by-pass before/after graphs,
-   a dependency schedule, tile choices, inclusive lifetimes and arena offsets.
-2. **GPU kernels:** independent kernel tests and benchmark tile sweeps expose
-   numerical checks, launch configurations, latency and shape-dependent tradeoffs.
-3. **Integrated execution:** `demo --backend all` executes the same graph on the
-   reference, emitted-instruction simulator, and compiled Triton GPU path.
+1. **Compiler:** `mlgpu inspect --workload epilogue` shows typed IR, each pass,
+   the dependency schedule, tile choices and arena allocations. The recorded
+   [epilogue plan](artifacts/audit/demos/epilogue.json) lowers matmul, bias and GELU
+   to this schedule entry (excerpt from `execution_plan.schedule[0]`):
 
-The initial subset includes 2D matmul, add/mul, ReLU/GELU, LayerNorm, Softmax,
-restricted reshape/transpose, and one-axis reductions. There is no arbitrary
-PyTorch graph import, autograd, distributed execution, or serving framework.
-See [architecture and precision](docs/architecture.md) for exact semantics,
-[compiler](docs/compiler.md), [simulator](docs/simulator.md),
-[kernels](docs/kernels.md), and [benchmarking](docs/benchmarking.md).
+   ```json
+   {"op":"fused_matmul","inputs":["x","w","b"],"output":"y","attrs":{"activation":"gelu"}}
+   ```
 
-Measured evidence and its interpretation are in [artifacts](artifacts/) and
-[results](docs/results.md). Performance claims must identify workload, precision, timing
-boundary, baseline, and hardware; vendor-wide speedup claims are not a goal.
+2. **Kernels:** `mlgpu microbenchmark --output artifacts/local/microbenchmarks.json`
+   measures standalone operations/fused regions and tile choices using the documented
+   capture policy. Inspect the [recorded kernel experiment](artifacts/audit/microbenchmarks.json)
+   and [CUDA profile](artifacts/audit/profile.json).
+3. **Integrated execution:** run each supported graph on the reference, emitted-instruction
+   simulator and GPU backends, and compare outputs:
+
+   ```bash
+   mlgpu demo --backend all --workload epilogue
+   mlgpu demo --backend all --workload norm
+   mlgpu demo --backend all --workload mlp --dtype float16
+   ```
+
+   The [recorded demonstrations](artifacts/audit/demos/) include plans, instructions
+   and correctness checks for all three backends. For ordinary dispatch and
+   allocation-inclusive comparisons, use `mlgpu benchmark --quick`.
+
+## Scope and deeper reading
+
+One consumer NVIDIA GPU, positive static shapes, contiguous FP16/FP32 tensors.
+Supported operations include 2D matmul, broadcast add/mul, ReLU/tanh-GELU,
+LayerNorm, Softmax, restricted reshape/transpose and one-axis sum. Arbitrary graph
+import, dynamic shapes, autograd, attention and production/distributed serving are
+outside the core scope. The compiler is Python-based; it is not a C++/LLVM/MLIR implementation.
+
+[Architecture and numerical contract](docs/architecture.md) · [Compiler](docs/compiler.md) ·
+[Kernels](docs/kernels.md) · [Simulator](docs/simulator.md) · [Benchmark methodology](docs/benchmarking.md) ·
+[Current results](docs/current-results.md) · [Historical study](docs/results.md) ·
+[Audit and regressions](docs/audit.md) · [Automated review history](docs/review.md).
+
+**License: pending owner decision.** No root `LICENSE` file has been added;
+[MIT / Apache-2.0 comparison and recommendation](docs/licensing.md).
