@@ -6,7 +6,7 @@ file is explicitly synthetic; it is not a GPU timing measurement.
 | Artifact | Contents |
 | --- | --- |
 | `environment.json` | Actual Python, OS, dependency and GPU identity |
-| `tests.xml` | Complete CPU/GPU test run; 270 passed, zero skipped |
+| `tests.xml` | Complete CPU/GPU test run; 277 passed, zero skipped |
 | `demos/*.json` | Original IR, pass traces, execution/memory plans, instructions and backend correctness |
 | `benchmarks.json` | 48 cases across four execution paths, 42 tile cases, raw timing/precision/memory data |
 | `microbenchmarks.json` | 30 captured region comparisons and 42 tile captures |
@@ -25,3 +25,5 @@ hardening, which preserves generated kernels. CUDA Graph experiments and the fin
 test run include that hardening. Changes to analysis and evidence do not change
 the measured kernel implementations. Raw reports are retained without filtering
 slow samples or replacing results with their minimum.
+The later scope-aware simplification fix handles preexisting fused input regions;
+the measured workload graphs do not contain that input pattern.

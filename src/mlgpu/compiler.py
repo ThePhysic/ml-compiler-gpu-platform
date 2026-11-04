@@ -120,13 +120,41 @@ def fold_constants(graph: Graph) -> Graph:
     return _prune(graph)
 
 
+def _substitute_inputs(node: Node, aliases: dict[str, str]) -> None:
+    """Substitute graph operands without capturing nested region-local names."""
+    old_inputs = node.inputs
+    new_inputs = tuple(aliases.get(name, name) for name in old_inputs)
+    node.inputs = new_inputs
+    if node.op != "fused_elementwise" or new_inputs == old_inputs:
+        return
+    steps = node.attrs["steps"]
+    # Locals may have the same spelling as a graph value outside this region.
+    # Renaming an external a -> x must not capture a local definition named x.
+    bindings = dict(zip(old_inputs, new_inputs))
+    external = set(new_inputs)
+    used = external | set(old_inputs) | {step["output"] for step in steps}
+    for index, step in enumerate(steps):
+        step["inputs"] = [bindings[name] for name in step["inputs"]]
+        original = step["output"]
+        renamed = original
+        if original in external:
+            suffix = 0
+            renamed = f"__region_{node.output}_{index}_{suffix}"
+            while renamed in used:
+                suffix += 1
+                renamed = f"__region_{node.output}_{index}_{suffix}"
+            used.add(renamed)
+        bindings[original] = renamed
+        step["output"] = renamed
+
+
 def simplify(graph: Graph) -> Graph:
     """Bypass internal identity/copy operations, preserving public output names."""
     specs = graph.specs()
     aliases: dict[str, str] = {}
     nodes = []
     for node in graph.ordered_nodes():
-        node.inputs = tuple(aliases.get(name, name) for name in node.inputs)
+        _substitute_inputs(node, aliases)
         trivial = node.op == "identity"
         if node.op == "reshape":
             trivial = specs[node.inputs[0]].shape == specs[node.output].shape

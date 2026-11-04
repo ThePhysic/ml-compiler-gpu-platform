@@ -9,7 +9,7 @@ and the experiment reports contain the measured software/hardware metadata.
 
 ## Correctness and coverage
 
-The implementation test run passed **270 tests with no skips or failures** on
+The implementation test run passed **277 tests with no skips or failures** on
 the physical GPU. [JUnit evidence](../artifacts/tests.xml) covers IR and compiler
 algorithms, inclusive memory lifetimes, randomized branched DAGs, simulator
 schedules/resources, independent GPU kernels, both precisions, shape tails,

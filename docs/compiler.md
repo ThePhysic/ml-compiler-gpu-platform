@@ -18,6 +18,8 @@ An unoptimized plan retains all original operations in topological order.
 2. **Simplification** bypasses internal identity operations, same-shape reshapes
    and identity transposes. Public graph output names are preserved. No algebraic
    `x * 0` or `x + 0` rules change NaN or signed-zero behavior.
+   Existing fused regions receive scope-aware external operand substitution;
+   colliding local definitions are renamed before aliases enter the region.
 3. **Matmul epilogue fusion** recognizes a 2-D matmul with optional bias `(N,)`
    or `(1,N)` and optional ReLU/tanh-GELU. Each removed intermediate must have
    exactly one use and must not be a graph output. Fanout, repeated operands and

@@ -228,3 +228,41 @@ def test_unoptimized_plan_preserves_nodes_and_records_no_rewrite_passes():
     plan = compile_graph(graph, optimize=False)
     assert [n.op for n in plan.nodes] == ["matmul", "add", "gelu"]
     assert all(p["pass"] in {"dependency_scheduling", "memory_planning"} for p in plan.passes)
+@pytest.mark.parametrize("dtype", ["float16", "float32"])
+@pytest.mark.parametrize("collision", [False, True])
+def test_simplify_preexisting_fused_region_external_alias_scope(dtype, collision):
+    from mlgpu.runtime import Program
+    spec = TensorSpec((3,), dtype)
+    local = "x" if collision else "temporary"
+    graph = Graph({"x": spec}, [
+        Node("identity", ("x",), "a"),
+        Node("fused_elementwise", ("a",), "y", {"steps": [
+            {"op": "relu", "inputs": ["a"], "output": local},
+            {"op": "mul", "inputs": [local, "a"], "output": "y"}]})], ("y",))
+    values = {"x": np.array([-1, 2, 3], dtype=dtype)}
+    original = graph.to_dict()
+    expected = execute(graph, values)
+    plan = compile_graph(graph)
+    assert graph.to_dict() == original
+    plan.graph.validate()
+    assert plan.nodes[0].inputs == ("x",)
+    assert plan.nodes[0].attrs["steps"][0]["output"] != "x"
+    np.testing.assert_array_equal(Program(graph).run(values)["y"], expected["y"])
+
+
+def test_simplify_region_multiple_aliases_duplicate_externals_and_fresh_names():
+    from mlgpu.runtime import Program
+    graph = Graph({"x": TensorSpec((3,)), "z": TensorSpec((3,))}, [
+        Node("identity", ("x",), "a0"), Node("identity", ("a0",), "a"),
+        Node("identity", ("z",), "b"),
+        Node("fused_elementwise", ("a", "b", "x"), "y", {"steps": [
+            {"op": "add", "inputs": ["a", "x"], "output": "z"},
+            {"op": "relu", "inputs": ["z"], "output": "__region_y_0_0"},
+            {"op": "mul", "inputs": ["__region_y_0_0", "b"], "output": "t"},
+            {"op": "add", "inputs": ["t", "a"], "output": "y"}]})], ("y",))
+    values = {"x": np.array([-1, 2, 3], np.float32), "z": np.array([4, -5, 6], np.float32)}
+    expected = execute(graph, values)
+    plan = compile_graph(graph)
+    plan.graph.validate()
+    assert plan.nodes[0].attrs["steps"][0]["output"] == "__region_y_0_1"
+    np.testing.assert_array_equal(Program(graph).run(values)["y"], expected["y"])

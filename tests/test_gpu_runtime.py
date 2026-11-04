@@ -111,3 +111,13 @@ def test_independent_kernel_rejects_ambiguous_repeated_names(torch_gpu):
     prepare_launch(Node("add", ("x", "x"), "y"), [a, a], out)()
     torch_gpu.cuda.synchronize()
     torch_gpu.testing.assert_close(out, a + a)
+
+
+@pytest.mark.parametrize("dtype", ["float16", "float32"])
+def test_preexisting_fused_region_alias_scope_on_gpu(torch_gpu, dtype):
+    graph = Graph({"x": TensorSpec((3, 7), dtype)}, [
+        Node("identity", ("x",), "a"),
+        Node("fused_elementwise", ("a",), "y", {"steps": [
+            {"op": "relu", "inputs": ["a"], "output": "x"},
+            {"op": "add", "inputs": ["x", "a"], "output": "y"}]})], ("y",))
+    compare(torch_gpu, graph)
