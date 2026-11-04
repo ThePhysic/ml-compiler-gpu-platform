@@ -98,6 +98,12 @@ def _validate(node, inputs, output, torch):
         raise ResourceError(f"GPU backend supports tensor rank <= {MAX_RANK}")
     if any(tensor.numel() >= 2**31 for tensor in tensors):
         raise ResourceError("GPU backend uses 32-bit indexing and requires fewer than 2^31 elements")
+    seen = {}
+    for name, tensor in zip(node.inputs, inputs):
+        descriptor = _descriptor(tensor)
+        if name in seen and seen[name] != descriptor:
+            raise ExecutionError("Repeated GPU input names must refer to the same tensor storage and metadata")
+        seen[name] = descriptor
     dtype = str(output.dtype).split(".")[-1]
     graph = Graph(
         {name: TensorSpec(tuple(tensor.shape), dtype) for name, tensor in zip(node.inputs, inputs)},

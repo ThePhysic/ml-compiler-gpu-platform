@@ -146,16 +146,20 @@ def infer_node(node: Node, specs: dict[str, TensorSpec]) -> TensorSpec:
             raise GraphError("fused elementwise region must have 1..16 steps")
         local = {name: specs[name] for name in node.inputs}
         produced = []
+        used_external = set()
         for step in steps:
             if not isinstance(step, dict) or not {"op", "inputs", "output"} <= set(step) or set(step) - {"op", "inputs", "output", "attrs"}:
                 raise GraphError("malformed fused elementwise step")
             sub = Node(step["op"], step["inputs"], step["output"], step.get("attrs", {}))
             if sub.op not in ELEMENTWISE or sub.output in local:
                 raise GraphError("fused elementwise region must be elementwise SSA")
+            used_external.update(x for x in sub.inputs if x in node.inputs)
             local[sub.output] = infer_node(sub, local)
             produced.append(sub.output)
         if produced[-1] != node.output or any(local[x] != local[produced[-1]] for x in produced):
             raise GraphError("fused elementwise steps must share the final shape and dtype")
+        if used_external != set(node.inputs):
+            raise GraphError("fused elementwise inputs must exactly name its external operands")
         return local[produced[-1]]
     return TensorSpec(shape, first.dtype)
 

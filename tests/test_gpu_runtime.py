@@ -99,3 +99,15 @@ def test_framework_reference_matches_numpy(torch_gpu):
         torch_gpu.cuda.synchronize()
         for name, value in zip(graph.outputs, actual):
             np.testing.assert_allclose(value.cpu().numpy(), expected[name], atol=.02, rtol=.02)
+
+
+def test_independent_kernel_rejects_ambiguous_repeated_names(torch_gpu):
+    from mlgpu.gpu import prepare_launch
+    a = torch_gpu.ones((2, 3), device="cuda")
+    b = torch_gpu.zeros_like(a)
+    out = torch_gpu.empty_like(a)
+    with pytest.raises(ExecutionError, match="Repeated GPU input names"):
+        prepare_launch(Node("add", ("x", "x"), "y"), [a, b], out)
+    prepare_launch(Node("add", ("x", "x"), "y"), [a, a], out)()
+    torch_gpu.cuda.synchronize()
+    torch_gpu.testing.assert_close(out, a + a)

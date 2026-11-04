@@ -67,3 +67,11 @@ def test_reject_bad_broadcast_matmul_reduction_and_norm_attrs():
                  Node("layernorm", ("x", "w", "w"), "y", {"eps": float("nan")})]:
         with pytest.raises(GraphError):
             Graph({"x": TensorSpec((2, 3)), "b": TensorSpec((4,)), "w": TensorSpec((3,))}, [node], ("y",)).validate()
+
+
+def test_fused_region_rejects_unused_external_inputs_before_lowering():
+    graph = Graph({"x": TensorSpec((2, 3)), "unused": TensorSpec((2, 2))}, [
+        Node("fused_elementwise", ("x", "unused"), "y", {"steps": [
+            {"op": "relu", "inputs": ["x"], "output": "y"}]})], ("y",))
+    with pytest.raises(GraphError, match="external operands"):
+        graph.validate()

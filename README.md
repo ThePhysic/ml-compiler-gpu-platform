@@ -39,6 +39,7 @@ mlgpu demo --backend all --workload epilogue
 mlgpu demo --backend all --workload norm
 mlgpu demo --backend all --workload mlp --dtype float16
 mlgpu benchmark --quick --output artifacts/local/benchmarks.json
+mlgpu microbenchmark --output artifacts/local/microbenchmarks.json
 mlgpu profile --output artifacts/local/profile.json
 ```
 
@@ -63,6 +64,6 @@ See [architecture and precision](docs/architecture.md) for exact semantics,
 [compiler](docs/compiler.md), [simulator](docs/simulator.md),
 [kernels](docs/kernels.md), and [benchmarking](docs/benchmarking.md).
 
-Measured evidence and its interpretation belong in `artifacts/` and
-`docs/results.md`. Performance claims must identify workload, precision, timing
+Measured evidence and its interpretation are in [artifacts](artifacts/) and
+[results](docs/results.md). Performance claims must identify workload, precision, timing
 boundary, baseline, and hardware; vendor-wide speedup claims are not a goal.

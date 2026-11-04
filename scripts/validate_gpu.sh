@@ -8,4 +8,5 @@ python -m mlgpu demo --backend all --workload epilogue --output artifacts/local/
 python -m mlgpu demo --backend all --workload norm --output artifacts/local/norm.json
 python -m mlgpu demo --backend all --workload mlp --dtype float16 --output artifacts/local/mlp.json
 python -m mlgpu benchmark --quick --output artifacts/local/benchmarks.json
+python -m mlgpu microbenchmark --output artifacts/local/microbenchmarks.json
 python -m mlgpu profile --output artifacts/local/profile.json

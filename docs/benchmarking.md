@@ -121,3 +121,39 @@ Primary API references: [CUDA events](https://docs.pytorch.org/docs/stable/gener
 [allocator peak statistics](https://docs.pytorch.org/docs/stable/generated/torch.cuda.memory.max_memory_allocated.html),
 [PyTorch profiler](https://docs.pytorch.org/docs/stable/profiler.html), and
 [`torch.compile`](https://docs.pytorch.org/docs/stable/generated/torch.compile.html).
+
+## CUDA Graph kernel microbenchmarks
+
+`microbench.run_suite(output_path, quick=True)` adds a separate device-region
+study. Each CUDA Graph captures 64 independent invocations with fixed inputs.
+Five replay warmups precede 15 timed graph replays (50 in full mode). Event time
+for a whole replay is divided by 64, removing Python launch gaps between the
+captured invocations and amortizing the graph replay overhead. All raw replay
+samples and per-region statistics are retained. Compiler, first-use, capture and
+total setup wall times are separate from device-region latency.
+
+The suite includes 30 single-operation or fused-region cases: matmul,
+matmul+bias+GELU, elementwise fusion, LayerNorm and Softmax, each across three
+shapes and two precisions. Custom optimized and PyTorch eager execution both
+use identical graph-capture repetition and timing policies. Framework allocation
+activity becomes fixed CUDA Graph pool storage; no Python allocation runs during
+replay. A further 42 captures measure seven matmul tile/warp configurations across
+the six shape/precision combinations, retaining actual compiler resource data.
+
+Capture uses a side stream that waits for input creation. Custom programs are
+bound on that stream, warmed before capture, and replayed and timed on the same
+stream. The graph, input tensors, final outputs and binding remain alive until
+replay and numerical validation finish. Outputs are checked against the NumPy
+reference after replay. Capture failure is fatal and recorded; ordinary launches
+are never substituted for unsuccessful capture.
+
+These results mean **hot-cache, repeated fixed-input CUDA Graph device-region
+latency**. They exclude Python dispatch, allocation, transfers and JIT. Reusing
+inputs and intermediate storage can strongly favor cache locality. CUDA Graph
+scheduling differs from ordinary runtime launches, and amortized replay overhead
+is not zero. Use this study alongside full graph and allocation-inclusive runtime
+measurements. Algorithmic bandwidth proxies remain distinct from measured DRAM
+traffic or hardware counters.
+
+Primary references: [PyTorch CUDA Graph semantics](https://docs.pytorch.org/docs/2.9/notes/cuda.html#cuda-graphs)
+and [CUDA Graph capture context](https://docs.pytorch.org/docs/2.9/generated/torch.cuda.graph.html).

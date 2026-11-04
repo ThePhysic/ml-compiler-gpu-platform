@@ -105,6 +105,9 @@ def main(argv=None):
     bench.add_argument("--output", default="artifacts/local/benchmarks.json")
     bench.add_argument("--quick", action="store_true")
     bench.add_argument("--no-inductor", action="store_true")
+    micro = sub.add_parser("microbenchmark", help="CUDA Graph device-region latency without Python dispatch gaps")
+    micro.add_argument("--output", default="artifacts/local/microbenchmarks.json")
+    micro.add_argument("--full", action="store_true")
     prof = sub.add_parser("profile")
     prof.add_argument("--output", default="artifacts/local/profile.json")
     args = parser.parse_args(argv)
@@ -119,6 +122,9 @@ def main(argv=None):
         elif args.command == "benchmark":
             from .benchmark import run_suite
             result = run_suite(args.output, quick=args.quick, include_inductor=not args.no_inductor)
+        elif args.command == "microbenchmark":
+            from .microbench import run_suite
+            result = run_suite(args.output, quick=not args.full)
         else:
             from .benchmark import profile_graph
             result = profile_graph(args.output)
@@ -126,7 +132,7 @@ def main(argv=None):
             write_json(args.output, result)
         if args.command == "demo":
             print(json.dumps({"workload": result["workload"], "backends": result["backends"], "arena_bytes": result["execution_plan"]["memory"]["peak_bytes"], "output": args.output}, indent=2))
-        elif args.command in {"benchmark", "profile"}:
+        elif args.command in {"benchmark", "microbenchmark", "profile"}:
             print(f"{args.command} evidence written to {args.output}")
         else:
             print(json.dumps(result, indent=2))
