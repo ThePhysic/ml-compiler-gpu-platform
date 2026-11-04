@@ -1,0 +1,394 @@
+{
+  "kind": "synthetic_estimates_not_physical_measurements",
+  "graph": {
+    "name": "epilogue",
+    "inputs": {
+      "x": {
+        "shape": [
+          37,
+          41
+        ],
+        "dtype": "float32",
+        "strides": [
+          41,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w": {
+        "shape": [
+          41,
+          29
+        ],
+        "dtype": "float32",
+        "strides": [
+          29,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b": {
+        "shape": [
+          29
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      }
+    },
+    "constants": {},
+    "nodes": [
+      {
+        "op": "matmul",
+        "inputs": [
+          "x",
+          "w"
+        ],
+        "output": "mm",
+        "attrs": {}
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "mm",
+          "b"
+        ],
+        "output": "biased",
+        "attrs": {}
+      },
+      {
+        "op": "gelu",
+        "inputs": [
+          "biased"
+        ],
+        "output": "y",
+        "attrs": {}
+      }
+    ],
+    "outputs": [
+      "y"
+    ],
+    "values": {
+      "x": {
+        "shape": [
+          37,
+          41
+        ],
+        "dtype": "float32",
+        "strides": [
+          41,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w": {
+        "shape": [
+          41,
+          29
+        ],
+        "dtype": "float32",
+        "strides": [
+          29,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b": {
+        "shape": [
+          29
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "mm": {
+        "shape": [
+          37,
+          29
+        ],
+        "dtype": "float32",
+        "strides": [
+          29,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "biased": {
+        "shape": [
+          37,
+          29
+        ],
+        "dtype": "float32",
+        "strides": [
+          29,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "y": {
+        "shape": [
+          37,
+          29
+        ],
+        "dtype": "float32",
+        "strides": [
+          29,
+          1
+        ],
+        "layout": "contiguous"
+      }
+    }
+  },
+  "configurations": {
+    "default_64k": {
+      "hardware": {
+        "local_memory_bytes": 65536,
+        "banks": 8,
+        "compute_units": 2,
+        "transfer_units": 1,
+        "flops_per_cycle_per_unit": 256,
+        "bytes_per_cycle_per_transfer": 32,
+        "instruction_setup_cycles": 4,
+        "core_clock_ghz": 1.0,
+        "max_tile": 32,
+        "bank_bytes": 8192,
+        "tile_contexts": 2,
+        "unusable_remainder_bytes": 0
+      },
+      "baseline": {
+        "correct": true,
+        "tiles": {
+          "mm": {
+            "block_m": 8,
+            "block_n": 8,
+            "block_k": 8
+          },
+          "biased": {
+            "output_elements": 64
+          },
+          "y": {
+            "output_elements": 64
+          }
+        },
+        "estimate": {
+          "kind": "simulated_estimate_not_hardware_measurement",
+          "cycles": 3676,
+          "estimated_microseconds": 3.676,
+          "instruction_count": 522,
+          "transfer_bytes": 73804,
+          "modeled_flops": 113738,
+          "peak_local_bytes": 1536,
+          "global_storage_bytes": 23816,
+          "resource_busy_cycles": {
+            "compute:0": 1260,
+            "compute:1": 32,
+            "dma:0": 3626
+          },
+          "resource_utilization": {
+            "compute:0": 0.34276387377584333,
+            "compute:1": 0.008705114254624592,
+            "dma:0": 0.9863982589771491
+          }
+        }
+      },
+      "optimized": {
+        "correct": true,
+        "tiles": {
+          "y": {
+            "block_m": 32,
+            "block_n": 29,
+            "block_k": 32
+          }
+        },
+        "estimate": {
+          "kind": "simulated_estimate_not_hardware_measurement",
+          "cycles": 956,
+          "estimated_microseconds": 0.956,
+          "instruction_count": 20,
+          "transfer_bytes": 24164,
+          "modeled_flops": 111592,
+          "peak_local_bytes": 20744,
+          "global_storage_bytes": 15232,
+          "resource_busy_cycles": {
+            "compute:0": 411,
+            "dma:0": 806,
+            "compute:1": 61
+          },
+          "resource_utilization": {
+            "compute:0": 0.4299163179916318,
+            "dma:0": 0.8430962343096234,
+            "compute:1": 0.06380753138075314
+          }
+        }
+      }
+    },
+    "constrained_2k": {
+      "hardware": {
+        "local_memory_bytes": 2048,
+        "banks": 8,
+        "compute_units": 2,
+        "transfer_units": 1,
+        "flops_per_cycle_per_unit": 256,
+        "bytes_per_cycle_per_transfer": 32,
+        "instruction_setup_cycles": 4,
+        "core_clock_ghz": 1.0,
+        "max_tile": 32,
+        "bank_bytes": 256,
+        "tile_contexts": 2,
+        "unusable_remainder_bytes": 0
+      },
+      "baseline": {
+        "correct": true,
+        "tiles": {
+          "mm": {
+            "block_m": 8,
+            "block_n": 8,
+            "block_k": 8
+          },
+          "biased": {
+            "output_elements": 64
+          },
+          "y": {
+            "output_elements": 64
+          }
+        },
+        "estimate": {
+          "kind": "simulated_estimate_not_hardware_measurement",
+          "cycles": 3676,
+          "estimated_microseconds": 3.676,
+          "instruction_count": 522,
+          "transfer_bytes": 73804,
+          "modeled_flops": 113738,
+          "peak_local_bytes": 1536,
+          "global_storage_bytes": 23816,
+          "resource_busy_cycles": {
+            "compute:0": 1260,
+            "compute:1": 32,
+            "dma:0": 3626
+          },
+          "resource_utilization": {
+            "compute:0": 0.34276387377584333,
+            "compute:1": 0.008705114254624592,
+            "dma:0": 0.9863982589771491
+          }
+        }
+      },
+      "optimized": {
+        "correct": true,
+        "tiles": {
+          "y": {
+            "block_m": 8,
+            "block_n": 8,
+            "block_k": 8
+          }
+        },
+        "estimate": {
+          "kind": "simulated_estimate_not_hardware_measurement",
+          "cycles": 2919,
+          "estimated_microseconds": 2.919,
+          "instruction_count": 440,
+          "transfer_bytes": 56636,
+          "modeled_flops": 111592,
+          "peak_local_bytes": 2048,
+          "global_storage_bytes": 15232,
+          "resource_busy_cycles": {
+            "compute:0": 1125,
+            "dma:0": 2895,
+            "compute:1": 13
+          },
+          "resource_utilization": {
+            "compute:0": 0.3854059609455293,
+            "dma:0": 0.9917780061664954,
+            "compute:1": 0.004453579993148339
+          }
+        }
+      }
+    },
+    "slow_dma_64k": {
+      "hardware": {
+        "local_memory_bytes": 65536,
+        "banks": 8,
+        "compute_units": 2,
+        "transfer_units": 1,
+        "flops_per_cycle_per_unit": 256,
+        "bytes_per_cycle_per_transfer": 8,
+        "instruction_setup_cycles": 4,
+        "core_clock_ghz": 1.0,
+        "max_tile": 32,
+        "bank_bytes": 8192,
+        "tile_contexts": 2,
+        "unusable_remainder_bytes": 0
+      },
+      "baseline": {
+        "correct": true,
+        "tiles": {
+          "mm": {
+            "block_m": 8,
+            "block_n": 8,
+            "block_k": 8
+          },
+          "biased": {
+            "output_elements": 64
+          },
+          "y": {
+            "output_elements": 64
+          }
+        },
+        "estimate": {
+          "kind": "simulated_estimate_not_hardware_measurement",
+          "cycles": 10590,
+          "estimated_microseconds": 10.59,
+          "instruction_count": 522,
+          "transfer_bytes": 73804,
+          "modeled_flops": 113738,
+          "peak_local_bytes": 1536,
+          "global_storage_bytes": 23816,
+          "resource_busy_cycles": {
+            "compute:0": 1287,
+            "compute:1": 5,
+            "dma:0": 10544
+          },
+          "resource_utilization": {
+            "compute:0": 0.12152974504249292,
+            "compute:1": 0.00047214353163361664,
+            "dma:0": 0.9956562795089707
+          }
+        }
+      },
+      "optimized": {
+        "correct": true,
+        "tiles": {
+          "y": {
+            "block_m": 32,
+            "block_n": 29,
+            "block_k": 32
+          }
+        },
+        "estimate": {
+          "kind": "simulated_estimate_not_hardware_measurement",
+          "cycles": 3087,
+          "estimated_microseconds": 3.087,
+          "instruction_count": 20,
+          "transfer_bytes": 24164,
+          "modeled_flops": 111592,
+          "peak_local_bytes": 20164,
+          "global_storage_bytes": 15232,
+          "resource_busy_cycles": {
+            "compute:0": 467,
+            "dma:0": 3071,
+            "compute:1": 5
+          },
+          "resource_utilization": {
+            "compute:0": 0.15127955944282476,
+            "dma:0": 0.9948169744088111,
+            "compute:1": 0.0016196954972465176
+          }
+        }
+      }
+    }
+  }
+}

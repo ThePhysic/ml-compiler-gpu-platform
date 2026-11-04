@@ -31,8 +31,10 @@ mlgpu demo --backend all --workload epilogue --output artifacts/local/epilogue.j
 mlgpu demo --backend all --workload norm --output artifacts/local/norm.json
 mlgpu demo --backend all --workload mlp --dtype float16 --output artifacts/local/mlp.json
 mlgpu benchmark --quick --output artifacts/local/benchmarks.json
+mlgpu microbenchmark --output artifacts/local/microbenchmarks.json
 mlgpu profile --output artifacts/local/profile.json
 ```
 
-Committed evidence must identify the machine and versions used. Test counts and
-review status are recorded after the corresponding runs, not inferred from code.
+Committed evidence identifies the machine and versions used. See
+[measured results](results.md) and the committed artifacts for the actual validation
+outcome. Independent Astra review is recorded separately after its completion.

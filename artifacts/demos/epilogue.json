@@ -1,0 +1,2249 @@
+{
+  "workload": "epilogue",
+  "dtype": "float32",
+  "shape_parameters": {
+    "m": 17,
+    "k": 31,
+    "n": 47
+  },
+  "input_ir": {
+    "name": "epilogue",
+    "inputs": {
+      "x": {
+        "shape": [
+          17,
+          31
+        ],
+        "dtype": "float32",
+        "strides": [
+          31,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w": {
+        "shape": [
+          31,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b": {
+        "shape": [
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      }
+    },
+    "constants": {},
+    "nodes": [
+      {
+        "op": "matmul",
+        "inputs": [
+          "x",
+          "w"
+        ],
+        "output": "mm",
+        "attrs": {}
+      },
+      {
+        "op": "add",
+        "inputs": [
+          "mm",
+          "b"
+        ],
+        "output": "biased",
+        "attrs": {}
+      },
+      {
+        "op": "gelu",
+        "inputs": [
+          "biased"
+        ],
+        "output": "y",
+        "attrs": {}
+      }
+    ],
+    "outputs": [
+      "y"
+    ],
+    "values": {
+      "x": {
+        "shape": [
+          17,
+          31
+        ],
+        "dtype": "float32",
+        "strides": [
+          31,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "w": {
+        "shape": [
+          31,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "b": {
+        "shape": [
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "mm": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "biased": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      },
+      "y": {
+        "shape": [
+          17,
+          47
+        ],
+        "dtype": "float32",
+        "strides": [
+          47,
+          1
+        ],
+        "layout": "contiguous"
+      }
+    }
+  },
+  "execution_plan": {
+    "graph": {
+      "name": "epilogue",
+      "inputs": {
+        "x": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float32",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w": {
+          "shape": [
+            31,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        }
+      },
+      "constants": {},
+      "nodes": [
+        {
+          "op": "fused_matmul",
+          "inputs": [
+            "x",
+            "w",
+            "b"
+          ],
+          "output": "y",
+          "attrs": {
+            "activation": "gelu"
+          }
+        }
+      ],
+      "outputs": [
+        "y"
+      ],
+      "values": {
+        "x": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float32",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w": {
+          "shape": [
+            31,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "y": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        }
+      }
+    },
+    "schedule": [
+      {
+        "op": "fused_matmul",
+        "inputs": [
+          "x",
+          "w",
+          "b"
+        ],
+        "output": "y",
+        "attrs": {
+          "activation": "gelu"
+        }
+      }
+    ],
+    "memory": {
+      "alignment": 256,
+      "peak_bytes": 3328,
+      "naive_bytes": 3328,
+      "external_values": [
+        "x",
+        "w",
+        "b"
+      ],
+      "allocations": {
+        "y": {
+          "offset": 0,
+          "size": 3196,
+          "start": 0,
+          "end": 1,
+          "reserved_size": 3328
+        }
+      }
+    },
+    "passes": [
+      {
+        "pass": "constant_folding",
+        "changed": false,
+        "before_nodes": 3,
+        "after_nodes": 3,
+        "before": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w"
+              ],
+              "output": "mm",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "mm",
+                "b"
+              ],
+              "output": "biased",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "biased"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "mm": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "biased": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w"
+              ],
+              "output": "mm",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "mm",
+                "b"
+              ],
+              "output": "biased",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "biased"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "mm": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "biased": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "simplification",
+        "changed": false,
+        "before_nodes": 3,
+        "after_nodes": 3,
+        "before": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w"
+              ],
+              "output": "mm",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "mm",
+                "b"
+              ],
+              "output": "biased",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "biased"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "mm": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "biased": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w"
+              ],
+              "output": "mm",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "mm",
+                "b"
+              ],
+              "output": "biased",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "biased"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "mm": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "biased": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "matmul_epilogue_fusion",
+        "changed": true,
+        "before_nodes": 3,
+        "after_nodes": 1,
+        "before": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "matmul",
+              "inputs": [
+                "x",
+                "w"
+              ],
+              "output": "mm",
+              "attrs": {}
+            },
+            {
+              "op": "add",
+              "inputs": [
+                "mm",
+                "b"
+              ],
+              "output": "biased",
+              "attrs": {}
+            },
+            {
+              "op": "gelu",
+              "inputs": [
+                "biased"
+              ],
+              "output": "y",
+              "attrs": {}
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "mm": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "biased": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w",
+                "b"
+              ],
+              "output": "y",
+              "attrs": {
+                "activation": "gelu"
+              }
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "elementwise_fusion",
+        "changed": false,
+        "before_nodes": 1,
+        "after_nodes": 1,
+        "before": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w",
+                "b"
+              ],
+              "output": "y",
+              "attrs": {
+                "activation": "gelu"
+              }
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w",
+                "b"
+              ],
+              "output": "y",
+              "attrs": {
+                "activation": "gelu"
+              }
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "dead_code_elimination",
+        "changed": false,
+        "before_nodes": 1,
+        "after_nodes": 1,
+        "before": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w",
+                "b"
+              ],
+              "output": "y",
+              "attrs": {
+                "activation": "gelu"
+              }
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        },
+        "after": {
+          "name": "epilogue",
+          "inputs": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            }
+          },
+          "constants": {},
+          "nodes": [
+            {
+              "op": "fused_matmul",
+              "inputs": [
+                "x",
+                "w",
+                "b"
+              ],
+              "output": "y",
+              "attrs": {
+                "activation": "gelu"
+              }
+            }
+          ],
+          "outputs": [
+            "y"
+          ],
+          "values": {
+            "x": {
+              "shape": [
+                17,
+                31
+              ],
+              "dtype": "float32",
+              "strides": [
+                31,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "w": {
+              "shape": [
+                31,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "b": {
+              "shape": [
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                1
+              ],
+              "layout": "contiguous"
+            },
+            "y": {
+              "shape": [
+                17,
+                47
+              ],
+              "dtype": "float32",
+              "strides": [
+                47,
+                1
+              ],
+              "layout": "contiguous"
+            }
+          }
+        }
+      },
+      {
+        "pass": "dependency_scheduling",
+        "changed": false,
+        "order": [
+          "y"
+        ]
+      },
+      {
+        "pass": "memory_planning",
+        "changed": false,
+        "arena_bytes": 3328,
+        "naive_bytes": 3328
+      }
+    ],
+    "tiles": {
+      "y": {
+        "block_m": 32,
+        "block_n": 64,
+        "block_k": 32,
+        "num_warps": 4
+      }
+    }
+  },
+  "backends": {
+    "reference": {
+      "correct": true,
+      "max_absolute_error": {
+        "y": 0.0
+      },
+      "demonstration_wall_ms_including_setup": 1.4484749999610358
+    },
+    "simulator": {
+      "correct": true,
+      "max_absolute_error": {
+        "y": 0.0
+      },
+      "demonstration_wall_ms_including_setup": 3.431691999992381
+    },
+    "gpu": {
+      "correct": true,
+      "max_absolute_error": {
+        "y": 4.76837158203125e-07
+      },
+      "demonstration_wall_ms_including_setup": 4048.562911000033
+    }
+  },
+  "simulator_plan": {
+    "backend": "synthetic_tensor_accelerator",
+    "optimized": true,
+    "hardware": {
+      "local_memory_bytes": 65536,
+      "banks": 8,
+      "compute_units": 2,
+      "transfer_units": 1,
+      "flops_per_cycle_per_unit": 256,
+      "bytes_per_cycle_per_transfer": 32,
+      "instruction_setup_cycles": 4,
+      "core_clock_ghz": 1.0,
+      "max_tile": 32,
+      "bank_bytes": 8192,
+      "tile_contexts": 2,
+      "unusable_remainder_bytes": 0
+    },
+    "graph": {
+      "name": "epilogue",
+      "inputs": {
+        "x": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float32",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w": {
+          "shape": [
+            31,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        }
+      },
+      "constants": {},
+      "nodes": [
+        {
+          "op": "fused_matmul",
+          "inputs": [
+            "x",
+            "w",
+            "b"
+          ],
+          "output": "y",
+          "attrs": {
+            "activation": "gelu"
+          }
+        }
+      ],
+      "outputs": [
+        "y"
+      ],
+      "values": {
+        "x": {
+          "shape": [
+            17,
+            31
+          ],
+          "dtype": "float32",
+          "strides": [
+            31,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "w": {
+          "shape": [
+            31,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "b": {
+          "shape": [
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            1
+          ],
+          "layout": "contiguous"
+        },
+        "y": {
+          "shape": [
+            17,
+            47
+          ],
+          "dtype": "float32",
+          "strides": [
+            47,
+            1
+          ],
+          "layout": "contiguous"
+        }
+      }
+    },
+    "tiles": {
+      "y": {
+        "block_m": 17,
+        "block_n": 32,
+        "block_k": 31
+      }
+    },
+    "node_order": [
+      "y"
+    ],
+    "instructions": [
+      {
+        "id": 0,
+        "op": "zero",
+        "deps": [],
+        "start_cycle": 0,
+        "end_cycle": 7,
+        "resource": "compute:0",
+        "banks": [
+          2
+        ],
+        "transfer_bytes": 0,
+        "flops": 544,
+        "attrs": {
+          "buffer_writes": {
+            "2": "c:y:0:0"
+          },
+          "size_by_bank": {
+            "2": 2176
+          },
+          "shape": [
+            17,
+            32
+          ],
+          "bank": 2
+        }
+      },
+      {
+        "id": 1,
+        "op": "load",
+        "deps": [
+          0
+        ],
+        "start_cycle": 72,
+        "end_cycle": 142,
+        "resource": "dma:0",
+        "banks": [
+          0
+        ],
+        "transfer_bytes": 2108,
+        "flops": 0,
+        "attrs": {
+          "tensor": "x",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "bank": 0,
+          "buffer_writes": {
+            "0": "a:y:0:0:0"
+          },
+          "size_by_bank": {
+            "0": 2108
+          }
+        }
+      },
+      {
+        "id": 2,
+        "op": "load",
+        "deps": [
+          0
+        ],
+        "start_cycle": 142,
+        "end_cycle": 270,
+        "resource": "dma:0",
+        "banks": [
+          1
+        ],
+        "transfer_bytes": 3968,
+        "flops": 0,
+        "attrs": {
+          "tensor": "w",
+          "slices": [
+            [
+              0,
+              31
+            ],
+            [
+              0,
+              32
+            ]
+          ],
+          "bank": 1,
+          "buffer_writes": {
+            "1": "b:y:0:0:0"
+          },
+          "size_by_bank": {
+            "1": 3968
+          }
+        }
+      },
+      {
+        "id": 3,
+        "op": "mma",
+        "deps": [
+          0,
+          1,
+          2
+        ],
+        "start_cycle": 270,
+        "end_cycle": 406,
+        "resource": "compute:0",
+        "banks": [
+          0,
+          1,
+          2
+        ],
+        "transfer_bytes": 0,
+        "flops": 33728,
+        "attrs": {
+          "a_bank": 0,
+          "b_bank": 1,
+          "c_bank": 2,
+          "buffer_reads": {
+            "0": "a:y:0:0:0",
+            "1": "b:y:0:0:0",
+            "2": "c:y:0:0"
+          },
+          "buffer_writes": {
+            "2": "c:y:0:0"
+          },
+          "size_by_bank": {
+            "2": 2176
+          }
+        }
+      },
+      {
+        "id": 4,
+        "op": "load",
+        "deps": [],
+        "start_cycle": 0,
+        "end_cycle": 72,
+        "resource": "dma:0",
+        "banks": [
+          3
+        ],
+        "transfer_bytes": 2176,
+        "flops": 0,
+        "attrs": {
+          "tensor": "b",
+          "broadcast_shape": [
+            17,
+            47
+          ],
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              32
+            ]
+          ],
+          "bank": 3,
+          "buffer_writes": {
+            "3": "bias:y:0:0"
+          },
+          "size_by_bank": {
+            "3": 2176
+          }
+        }
+      },
+      {
+        "id": 5,
+        "op": "epilogue",
+        "deps": [
+          3,
+          4
+        ],
+        "start_cycle": 406,
+        "end_cycle": 455,
+        "resource": "compute:0",
+        "banks": [
+          2,
+          3
+        ],
+        "transfer_bytes": 0,
+        "flops": 11424,
+        "attrs": {
+          "c_bank": 2,
+          "bias_bank": 3,
+          "dtype": "float32",
+          "activation": "gelu",
+          "buffer_reads": {
+            "2": "c:y:0:0",
+            "3": "bias:y:0:0"
+          },
+          "buffer_writes": {
+            "2": "c:y:0:0"
+          },
+          "size_by_bank": {
+            "2": 2176
+          }
+        }
+      },
+      {
+        "id": 6,
+        "op": "store",
+        "deps": [
+          5
+        ],
+        "start_cycle": 455,
+        "end_cycle": 527,
+        "resource": "dma:0",
+        "banks": [
+          2
+        ],
+        "transfer_bytes": 2176,
+        "flops": 0,
+        "attrs": {
+          "tensor": "y",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              32
+            ]
+          ],
+          "bank": 2,
+          "buffer_reads": {
+            "2": "c:y:0:0"
+          }
+        }
+      },
+      {
+        "id": 7,
+        "op": "zero",
+        "deps": [],
+        "start_cycle": 0,
+        "end_cycle": 5,
+        "resource": "compute:1",
+        "banks": [
+          6
+        ],
+        "transfer_bytes": 0,
+        "flops": 255,
+        "attrs": {
+          "buffer_writes": {
+            "6": "c:y:0:32"
+          },
+          "size_by_bank": {
+            "6": 1020
+          },
+          "shape": [
+            17,
+            15
+          ],
+          "bank": 6
+        }
+      },
+      {
+        "id": 8,
+        "op": "load",
+        "deps": [
+          7
+        ],
+        "start_cycle": 270,
+        "end_cycle": 340,
+        "resource": "dma:0",
+        "banks": [
+          4
+        ],
+        "transfer_bytes": 2108,
+        "flops": 0,
+        "attrs": {
+          "tensor": "x",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "bank": 4,
+          "buffer_writes": {
+            "4": "a:y:0:32:0"
+          },
+          "size_by_bank": {
+            "4": 2108
+          }
+        }
+      },
+      {
+        "id": 9,
+        "op": "load",
+        "deps": [
+          7
+        ],
+        "start_cycle": 340,
+        "end_cycle": 403,
+        "resource": "dma:0",
+        "banks": [
+          5
+        ],
+        "transfer_bytes": 1860,
+        "flops": 0,
+        "attrs": {
+          "tensor": "w",
+          "slices": [
+            [
+              0,
+              31
+            ],
+            [
+              32,
+              47
+            ]
+          ],
+          "bank": 5,
+          "buffer_writes": {
+            "5": "b:y:0:32:0"
+          },
+          "size_by_bank": {
+            "5": 1860
+          }
+        }
+      },
+      {
+        "id": 10,
+        "op": "mma",
+        "deps": [
+          7,
+          8,
+          9
+        ],
+        "start_cycle": 403,
+        "end_cycle": 469,
+        "resource": "compute:1",
+        "banks": [
+          4,
+          5,
+          6
+        ],
+        "transfer_bytes": 0,
+        "flops": 15810,
+        "attrs": {
+          "a_bank": 4,
+          "b_bank": 5,
+          "c_bank": 6,
+          "buffer_reads": {
+            "4": "a:y:0:32:0",
+            "5": "b:y:0:32:0",
+            "6": "c:y:0:32"
+          },
+          "buffer_writes": {
+            "6": "c:y:0:32"
+          },
+          "size_by_bank": {
+            "6": 1020
+          }
+        }
+      },
+      {
+        "id": 11,
+        "op": "load",
+        "deps": [],
+        "start_cycle": 403,
+        "end_cycle": 439,
+        "resource": "dma:0",
+        "banks": [
+          7
+        ],
+        "transfer_bytes": 1020,
+        "flops": 0,
+        "attrs": {
+          "tensor": "b",
+          "broadcast_shape": [
+            17,
+            47
+          ],
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              32,
+              47
+            ]
+          ],
+          "bank": 7,
+          "buffer_writes": {
+            "7": "bias:y:0:32"
+          },
+          "size_by_bank": {
+            "7": 1020
+          }
+        }
+      },
+      {
+        "id": 12,
+        "op": "epilogue",
+        "deps": [
+          10,
+          11
+        ],
+        "start_cycle": 469,
+        "end_cycle": 494,
+        "resource": "compute:0",
+        "banks": [
+          6,
+          7
+        ],
+        "transfer_bytes": 0,
+        "flops": 5355,
+        "attrs": {
+          "c_bank": 6,
+          "bias_bank": 7,
+          "dtype": "float32",
+          "activation": "gelu",
+          "buffer_reads": {
+            "6": "c:y:0:32",
+            "7": "bias:y:0:32"
+          },
+          "buffer_writes": {
+            "6": "c:y:0:32"
+          },
+          "size_by_bank": {
+            "6": 1020
+          }
+        }
+      },
+      {
+        "id": 13,
+        "op": "store",
+        "deps": [
+          12
+        ],
+        "start_cycle": 527,
+        "end_cycle": 563,
+        "resource": "dma:0",
+        "banks": [
+          6
+        ],
+        "transfer_bytes": 1020,
+        "flops": 0,
+        "attrs": {
+          "tensor": "y",
+          "slices": [
+            [
+              0,
+              17
+            ],
+            [
+              32,
+              47
+            ]
+          ],
+          "bank": 6,
+          "buffer_reads": {
+            "6": "c:y:0:32"
+          }
+        }
+      }
+    ],
+    "estimate": {
+      "kind": "simulated_estimate_not_hardware_measurement",
+      "cycles": 563,
+      "estimated_microseconds": 0.563,
+      "instruction_count": 14,
+      "transfer_bytes": 16436,
+      "modeled_flops": 67116,
+      "peak_local_bytes": 16436,
+      "global_storage_bytes": 11320,
+      "resource_busy_cycles": {
+        "compute:0": 217,
+        "dma:0": 547,
+        "compute:1": 71
+      },
+      "resource_utilization": {
+        "compute:0": 0.38543516873889877,
+        "dma:0": 0.9715808170515098,
+        "compute:1": 0.1261101243339254
+      }
+    }
+  },
+  "simulator_cost_estimate": {
+    "kind": "simulated_estimate_not_hardware_measurement",
+    "cycles": 563,
+    "estimated_microseconds": 0.563,
+    "instruction_count": 14,
+    "transfer_bytes": 16436,
+    "modeled_flops": 67116,
+    "peak_local_bytes": 16436,
+    "global_storage_bytes": 11320,
+    "resource_busy_cycles": {
+      "compute:0": 217,
+      "dma:0": 547,
+      "compute:1": 71
+    },
+    "resource_utilization": {
+      "compute:0": 0.38543516873889877,
+      "dma:0": 0.9715808170515098,
+      "compute:1": 0.1261101243339254
+    }
+  }
+}

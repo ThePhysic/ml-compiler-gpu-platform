@@ -427,7 +427,8 @@ def profile_graph(output_path):
         trace_path = path.with_suffix(".trace.json")
         table_path = path.with_suffix(".table.txt")
         profiler.export_chrome_trace(str(trace_path))
-        table_path.write_text(profiler.key_averages().table(sort_by="self_cuda_time_total", row_limit=100), encoding="utf-8")
+        table = profiler.key_averages().table(sort_by="self_cuda_time_total", row_limit=100)
+        table_path.write_text("\n".join(line.rstrip() for line in table.splitlines()) + "\n", encoding="utf-8")
         averages = []
         for event in profiler.key_averages():
             averages.append({"name": event.key, "count": event.count, "self_cpu_time_us": event.self_cpu_time_total,
