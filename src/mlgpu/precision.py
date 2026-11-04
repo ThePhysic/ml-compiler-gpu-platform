@@ -13,6 +13,8 @@ def ieee_float32(torch):
         torch.backends.cudnn.allow_tf32 = False
         yield
     finally:
-        torch.set_float32_matmul_precision(precision)
         torch.backends.cuda.matmul.allow_tf32 = matmul
         torch.backends.cudnn.allow_tf32 = cudnn
+        # The boolean flag and named mode share backend state. Restore the
+        # named mode last so "medium" retains its BF16 policy on PyTorch 2.9.
+        torch.set_float32_matmul_precision(precision)

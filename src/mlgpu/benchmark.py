@@ -396,9 +396,9 @@ def run_suite(output_path, quick=False, include_inductor=True):
     finally:
         report["elapsed_wall_seconds"] = time.perf_counter() - start_suite
         report["nvidia_smi_after"] = _nvidia_snapshot()
-        torch.set_float32_matmul_precision(original_precision)
         torch.backends.cuda.matmul.allow_tf32 = original_tf32
         torch.backends.cudnn.allow_tf32 = original_cudnn_tf32
+        torch.set_float32_matmul_precision(original_precision)
         _write_report(output_path, report)
     if report["failures"]:
         raise ExecutionError(f"benchmark recorded {len(report['failures'])} failure(s); see {output_path}")
